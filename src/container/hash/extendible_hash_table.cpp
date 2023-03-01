@@ -23,7 +23,10 @@ namespace bustub {
 
 template <typename K, typename V>
 ExtendibleHashTable<K, V>::ExtendibleHashTable(size_t bucket_size)
-    : global_depth_(0), bucket_size_(bucket_size), num_buckets_(1) {}
+    : global_depth_(0), bucket_size_(bucket_size), num_buckets_(1) {
+      dir_.push_back(std::make_shared<Bucket>(bucket_size_, 0));
+      num_buckets_ = 1;
+    }
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::IndexOf(const K &key) -> size_t {
@@ -91,7 +94,7 @@ auto ExtendibleHashTable<K, V>::RemoveInternal(const K &key) -> bool {
 template <typename K, typename V>
 void ExtendibleHashTable<K, V>::Insert(const K &key, const V &value) {
   std::scoped_lock<std::mutex> lock(latch_);
-  return InsertInternal(key value);
+  return InsertInternal(key, value);
 }
 
 template <typename K, typename V>
@@ -117,13 +120,19 @@ auto ExtendibleHashTable<K, V>::RedistributeBucket(size_t dir_index) -> void{
   
   dir_[newIndex] = std::make_shared<Bucket>(bucket_size_, local_depth+1);
   dir_[dir_index]->IncrementDepth();
-
+  num_buckets_++;
+  
   std::list<std::pair<K,V>> &items = dir_[dir_index]->GetItems();
   std::list<std::pair<K,V>> &new_items = dir_[newIndex]->GetItems();
 
-  for(auto iter=items.begin(); iter!=items.end(); iter++){
-    if(iter->first & ((1 << (local_depth+1))-1) == newIndex){
-      new_items.push_back(*iter);
+  for(auto iter=items.begin(); iter!=items.end(); ){
+    if((std::hash<K>()(iter->first) & ((1 << (local_depth+1))-1)) == newIndex){
+      auto temp = iter;
+      iter++;
+      new_items.push_back(*temp);
+      items.erase(temp);
+    }else{
+      iter++;
     }
   }
 }
@@ -138,7 +147,7 @@ ExtendibleHashTable<K, V>::Bucket::Bucket(size_t array_size, int depth) : size_(
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Find(const K &key, V &value) -> bool {  
   typename std::list<std::pair<K,V>>::iterator iter;
-  for(iter=list_.begin(); iter!=list_.end(); i++){
+  for(iter=list_.begin(); iter!=list_.end(); iter++){
     if(iter->first == key){
       value = iter->second;
       return true;
@@ -150,7 +159,7 @@ auto ExtendibleHashTable<K, V>::Bucket::Find(const K &key, V &value) -> bool {
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Remove(const K &key) -> bool {
   typename std::list<std::pair<K,V>>::iterator iter;
-  for(iter=list_.begin(); iter!=list_.end(); i++){
+  for(iter=list_.begin(); iter!=list_.end(); iter++){
     if(iter->first == key){
       list_.erase(iter);
       return true;
@@ -162,7 +171,7 @@ auto ExtendibleHashTable<K, V>::Bucket::Remove(const K &key) -> bool {
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Insert(const K &key, const V &value) -> bool {
   typename std::list<std::pair<K,V>>::iterator iter;
-  for(iter=list_.begin(); iter!=list_.end(); i++){
+  for(iter=list_.begin(); iter!=list_.end(); iter++){
     if(iter->first == key){
       iter->second = value;
       return true;
