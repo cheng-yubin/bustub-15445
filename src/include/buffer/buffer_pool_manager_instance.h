@@ -60,7 +60,7 @@ class BufferPoolManagerInstance : public BufferPoolManager {
    * are currently in use and not evictable (in another word, pinned).
    *
    * You should pick the replacement frame from either the free list or the replacer (always find from the free list
-   * first), and then call the AllocatePage() method to get a new page id. If the replacement frame has a dirty page,
+   * first), an then call the AllocatePage() method to get a new page id. If the redplacement frame has a dirty page,
    * you should write it back to the disk first. You also need to reset the memory and metadata for the new page.
    *
    * Remember to "Pin" the frame by calling replacer.SetEvictable(frame_id, false)

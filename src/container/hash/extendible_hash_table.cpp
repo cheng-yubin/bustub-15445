@@ -111,30 +111,35 @@ void ExtendibleHashTable<K, V>::InsertInternal(const K &key, const V &value) {
   }
 
   RedistributeBucket(dir_index);
+  InsertInternal(key, value);
 }
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::RedistributeBucket(size_t dir_index) -> void{
   int local_depth = dir_[dir_index]->GetDepth();
-  size_t newIndex = (1 << local_depth) + dir_index;
-  
-  dir_[newIndex] = std::make_shared<Bucket>(bucket_size_, local_depth+1);
-  dir_[dir_index]->IncrementDepth();
-  num_buckets_++;
+
+  size_t index_low = dir_index & ((1 << local_depth) - 1);
+  size_t index_high = index_low + (1 << local_depth);
+
+  auto ptr_low = std::make_shared<Bucket>(bucket_size_, local_depth+1);
+  auto ptr_high = std::make_shared<Bucket>(bucket_size_, local_depth+1);
   
   std::list<std::pair<K,V>> &items = dir_[dir_index]->GetItems();
-  std::list<std::pair<K,V>> &new_items = dir_[newIndex]->GetItems();
-
-  for(auto iter=items.begin(); iter!=items.end(); ){
-    if((std::hash<K>()(iter->first) & ((1 << (local_depth+1))-1)) == newIndex){
-      auto temp = iter;
-      iter++;
-      new_items.push_back(*temp);
-      items.erase(temp);
+  std::list<std::pair<K,V>> &items_low = ptr_low->GetItems();
+  std::list<std::pair<K,V>> &items_high = ptr_high->GetItems();
+  
+  for(auto iter=items.begin(); iter!=items.end(); iter++){
+    if((std::hash<K>()(iter->first) & ((1 << (local_depth+1))-1)) == index_low){
+      items_low.push_back(*iter);
     }else{
-      iter++;
+      items_high.push_back(*iter);
     }
   }
+
+  dir_[index_low] = ptr_low;
+  dir_[index_high] = ptr_high;
+
+  num_buckets_++;
 }
 
 

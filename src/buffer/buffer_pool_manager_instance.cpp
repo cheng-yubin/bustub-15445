@@ -15,6 +15,7 @@
 #include "common/exception.h"
 #include "common/macros.h"
 
+
 namespace bustub {
 
 BufferPoolManagerInstance::BufferPoolManagerInstance(size_t pool_size, DiskManager *disk_manager, size_t replacer_k,
@@ -42,7 +43,23 @@ BufferPoolManagerInstance::~BufferPoolManagerInstance() {
   delete replacer_;
 }
 
-auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * { return nullptr; }
+auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * {
+  return nullptr;
+  // std::scoped_lock<std::mutex> lock(latch_);
+
+  // frame_id_t frame_id;
+  // if(free_list_.size() > 0){
+  //   frame_id = free_list_.back();
+  //   free_list_.pop_back();
+  // }else if(replacer_->Evict(&frame_id) == false){
+  //   return nullptr;
+  // }
+
+  // if(pages_[frame_id].IsDirty()){
+  //   FlushPgImp(pages_[frame_id].page_id_);
+  // }
+  // pages_[frame_id].page_id_ = *page_id;
+}
 
 auto BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) -> Page * { return nullptr; }
 
