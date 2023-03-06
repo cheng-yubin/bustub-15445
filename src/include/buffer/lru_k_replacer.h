@@ -162,7 +162,7 @@ class LRUKReplacer {
     /**
      * @brief append access record of this page.
      */
-    void RecordAccess(size_t timestamp);
+    void RecordAccess();
 
     /**
      * @brief Toggle whether a frame is evictable or non-evictable.
@@ -177,7 +177,7 @@ class LRUKReplacer {
     /**
      * @brief return the reference of the frame's history
      */
-    auto GetHistory() -> std::list<size_t> &;
+    auto GetHistory() -> std::list<timespec> &;
 
     /**
      * @brief clear the record of this frame:
@@ -187,7 +187,7 @@ class LRUKReplacer {
     void ClearRecord();
 
    private:
-    std::list<size_t> history_;  // access history of this page， the oldest one is in the front of the list
+    std::list<timespec> history_;  // access history of this page， the oldest one is in the front of the list
     size_t k_;
     bool is_evictable_{false};
   };
@@ -207,7 +207,7 @@ class LRUKReplacer {
   /**
    * @brief Get current timestamp (ms)
    */
-  auto GetCurrentTimestamp() -> size_t;
+  auto GetCurrentTimestamp() -> struct timespec;
 };
 
 }  // namespace bustub
