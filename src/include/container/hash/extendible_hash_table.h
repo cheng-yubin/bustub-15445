@@ -180,7 +180,7 @@ class ExtendibleHashTable : public HashTable<K, V> {
    * @brief Redistribute the kv pairs in a full bucket.
    * @param bucket The bucket to be redistributed.
    */
-  auto RedistributeBucket(size_t dir_index) -> void;
+  auto RedistributeBucket(const K &key) -> void;
 
   /*****************************************************************
    * Must acquire latch_ first before calling the below functions. *

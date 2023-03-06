@@ -52,7 +52,7 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   /** @brief Return the pointer to all the pages in the buffer pool. */
   auto GetPages() -> Page * { return pages_; }
 
-//  protected:
+  //  protected:
 
   /**
    * TODO(P1): Add implementation

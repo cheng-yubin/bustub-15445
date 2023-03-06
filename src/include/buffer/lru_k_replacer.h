@@ -12,13 +12,13 @@
 
 #pragma once
 
+#include <ctime>
 #include <limits>
 #include <list>
+#include <memory>
 #include <mutex>  // NOLINT
 #include <unordered_map>
 #include <vector>
-#include <memory>
-#include <time.h>
 #include "common/config.h"
 #include "common/macros.h"
 
@@ -134,71 +134,71 @@ class LRUKReplacer {
   auto Size() -> size_t;
 
   /**
-   * @brief Add the frame to EvictList according to its access history when the 
+   * @brief Add the frame to EvictList according to its access history when the
    * frame is set to evictable.
-  */
+   */
   void AddToEvictList(frame_id_t frame_id);
-  
+
   /**
    * @brief Remove the frame from EvictList when it is set to unevictable.
-  */
+   */
   void RemoveFromEvictList(frame_id_t frame_id);
-  
+
   /**
    * @brief Return whether frame1 should be evicted earlier than frame2.
-   * 
-  */
+   *
+   */
   auto EvictFirst(frame_id_t frame_id1, frame_id_t frame_id2) -> bool;
   /**
-   * 
-  */
-  class LRUKNode{
+   *
+   */
+  class LRUKNode {
    public:
     /**
-      * @brief a new LRUKNode.
-    */
+     * @brief a new LRUKNode.
+     */
     explicit LRUKNode(size_t k);
 
     /**
-     * @brief append access record of this page. 
-    */
+     * @brief append access record of this page.
+     */
     void RecordAccess(size_t timestamp);
 
     /**
      * @brief Toggle whether a frame is evictable or non-evictable.
-    */
+     */
     void SetEvictable(bool set_evictable);
 
     /**
      * @brief return whether the frame is evictable
-    */
-    bool IsEvictable();
+     */
+    auto IsEvictable() -> bool;
 
     /**
      * @brief return the reference of the frame's history
-    */
-    auto GetHistory() -> std::list<size_t> & ;
+     */
+    auto GetHistory() -> std::list<size_t> &;
 
     /**
      * @brief clear the record of this frame:
      * 1. clear history
      * 2. set frame as unevictable
-    */
+     */
     void ClearRecord();
 
    private:
-    std::list<size_t> history_;   // access history of this page， the oldest one is in the front of the list
+    std::list<size_t> history_;  // access history of this page， the oldest one is in the front of the list
     size_t k_;
     bool is_evictable_{false};
   };
-  
+
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
   // Remove maybe_unused if you start using them.
   std::unordered_map<frame_id_t, std::shared_ptr<LRUKNode>> node_store_;
   std::list<frame_id_t> evict_list_;
   std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> evict_map_;
-   
+
   size_t curr_size_{0};   // the number of evictable frames.
   size_t replacer_size_;  // the maximum number of the frames allowed.
   size_t k_;
@@ -206,7 +206,7 @@ class LRUKReplacer {
 
   /**
    * @brief Get current timestamp (ms)
-  */
+   */
   auto GetCurrentTimestamp() -> size_t;
 };
 
