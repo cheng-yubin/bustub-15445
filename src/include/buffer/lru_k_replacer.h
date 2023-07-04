@@ -12,12 +12,14 @@
 
 #pragma once
 
+#include <algorithm>
 #include <ctime>
 #include <limits>
 #include <list>
 #include <memory>
 #include <mutex>  // NOLINT
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include "common/config.h"
 #include "common/macros.h"
@@ -152,62 +154,34 @@ class LRUKReplacer {
   /**
    *
    */
-  class LRUKNode {
-   public:
-    /**
-     * @brief a new LRUKNode.
-     */
-    explicit LRUKNode(size_t k);
-
-    /**
-     * @brief append access record of this page.
-     */
-    void RecordAccess();
-
-    /**
-     * @brief Toggle whether a frame is evictable or non-evictable.
-     */
-    void SetEvictable(bool set_evictable);
-
-    /**
-     * @brief return whether the frame is evictable
-     */
-    auto IsEvictable() -> bool;
-
-    /**
-     * @brief return the reference of the frame's history
-     */
-    auto GetHistory() -> std::list<timespec> &;
-
-    /**
-     * @brief clear the record of this frame:
-     * 1. clear history
-     * 2. set frame as unevictable
-     */
-    void ClearRecord();
-
-   private:
-    std::list<timespec> history_;  // access history of this page， the oldest one is in the front of the list
-    size_t k_;
-    bool is_evictable_{false};
-  };
 
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
-  // Remove maybe_unused if you start using them.
-  std::unordered_map<frame_id_t, std::shared_ptr<LRUKNode>> node_store_;
-  std::list<frame_id_t> evict_list_;
-  std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> evict_map_;
+
+  std::unordered_map<frame_id_t, size_t> access_cnt_;
+  std::unordered_map<frame_id_t, std::list<size_t>> access_hist_;
+  std::unordered_map<frame_id_t, bool> evictable_;
+
+  using k_time = std::pair<frame_id_t, size_t>;
+  std::list<frame_id_t> frames_new_;
+  std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> locale_new_;
+
+  std::list<k_time> frames_k_;
+  std::unordered_map<frame_id_t, std::list<k_time>::iterator> locale_k_;
+
+  // std::list<k_time>
+  // std::unordered_map<frame_id_t, std::shared_ptr<LRUKNode>> node_store_;
+  // std::list<frame_id_t> evict_list_;
+  // std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> evict_map_;
 
   size_t curr_size_{0};   // the number of evictable frames.
   size_t replacer_size_;  // the maximum number of the frames allowed.
   size_t k_;
   std::mutex latch_;
 
-  /**
-   * @brief Get current timestamp (ms)
-   */
-  auto GetCurrentTimestamp() -> struct timespec;
+  size_t curr_timestamp_{0};
+
+  static auto CmpTimeStamp(const k_time &t1, const k_time &t2) -> bool;
 };
 
 }  // namespace bustub
