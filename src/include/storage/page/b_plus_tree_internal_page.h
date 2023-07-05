@@ -44,6 +44,6 @@ class BPlusTreeInternalPage : public BPlusTreePage {
 
  private:
   // Flexible array member for page data.
-  MappingType array_[1];
+  MappingType array_[INTERNAL_PAGE_SIZE];
 };
 }  // namespace bustub
