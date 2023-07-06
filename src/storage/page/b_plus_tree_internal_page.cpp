@@ -26,12 +26,13 @@ namespace bustub {
  */
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size) {
-  page_type_ = IndexPageType::INTERNAL_PAGE;
-  lsn_ = INVALID_LSN;
-  size_ = 0;
-  max_size_ = max_size;
-  parent_page_id_ = parent_id;
-  page_id_ = page_id;
+  LOG_DEBUG("leaf page init");
+  SetPageType(IndexPageType::INTERNAL_PAGE);
+  SetLSN(INVALID_LSN);
+  SetSize(0);
+  SetMaxSize(max_size);
+  SetParentPageId(parent_id);
+  SetPageId(page_id);
 }
 /*
  * Helper method to get/set the key associated with input "index"(a.k.a
@@ -55,6 +56,40 @@ INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType { 
   return array_[index].second; 
 }
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetValueAt(int index, const ValueType &value) {
+  array_[index].second = value;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetValue(const KeyType &key, const KeyComparator &comparator) const -> ValueType {
+  ValueType value = ValueAt(GetSize() - 1);
+  for(int index = 1; index < GetSize(); index++) {
+    if(comparator(key, KeyAt(index)) < 0) {
+      value = ValueAt(index - 1);
+      break;
+    }
+  }
+  return value;
+}
+
+
+// INDEX_TEMPLATE_ARGUMENTS
+// void B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(int index, const KeyType &key, const ValueType &value) {
+//   if(IsFull()) {
+//     LOG_DEBUG("error: array is full when InsertKV, b_plus_tree_internal_page.cpp");
+//     return;
+//   }
+  
+//   for(int i = size_ - 1; i >= index; i--) {
+//     array_[i+1] = array_[i];
+//   }
+
+//   array_[index].first = key;
+//   array_[index].second = value;
+// }
+
 
 // valuetype for internalNode should be page id_t
 template class BPlusTreeInternalPage<GenericKey<4>, page_id_t, GenericComparator<4>>;

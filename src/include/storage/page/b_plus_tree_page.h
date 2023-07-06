@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "common/logger.h"
 #include "buffer/buffer_pool_manager.h"
 #include "storage/index/generic_key.h"
 
@@ -49,6 +50,8 @@ class BPlusTreePage {
   auto GetSize() const -> int;
   void SetSize(int size);
   void IncreaseSize(int amount);
+  auto IsFull() const -> bool;
+  auto LessThanHalf() const -> bool;
 
   auto GetMaxSize() const -> int;
   void SetMaxSize(int max_size);

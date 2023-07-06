@@ -20,7 +20,6 @@ namespace bustub {
 auto BPlusTreePage::IsLeafPage() const -> bool { 
     return page_type_ == IndexPageType::LEAF_PAGE; 
 }
-// TODO: Root?
 auto BPlusTreePage::IsRootPage() const -> bool { 
     return page_type_ == IndexPageType::INTERNAL_PAGE; 
 }
@@ -40,6 +39,14 @@ void BPlusTreePage::SetSize(int size) {
 }
 void BPlusTreePage::IncreaseSize(int amount) {
     size_ += amount;
+}
+
+auto BPlusTreePage::IsFull() const -> bool {
+    return size_ >= max_size_;
+}
+
+auto BPlusTreePage::LessThanHalf() const -> bool {
+    return size_ < max_size_ / 2;
 }
 
 /*

@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <iostream>
 
 #include "buffer/buffer_pool_manager_instance.h"
 #include "gtest/gtest.h"
@@ -20,7 +21,7 @@
 
 namespace bustub {
 
-TEST(BPlusTreeTests, DISABLED_InsertTest1) {
+TEST(BPlusTreeTests, InsertTest1) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -47,7 +48,9 @@ TEST(BPlusTreeTests, DISABLED_InsertTest1) {
   tree.Insert(index_key, rid, transaction);
 
   auto root_page_id = tree.GetRootPageId();
+  std::cout << "root_page_id: " << root_page_id << std::endl;
   auto root_page = reinterpret_cast<BPlusTreePage *>(bpm->FetchPage(root_page_id)->GetData());
+  
   ASSERT_NE(root_page, nullptr);
   ASSERT_TRUE(root_page->IsLeafPage());
 

@@ -54,6 +54,9 @@ class BPlusTree {
   // return the value associated with a given key
   auto GetValue(const KeyType &key, std::vector<ValueType> *result, Transaction *transaction = nullptr) -> bool;
 
+  // 对于给定key，查找对应的leaf节点
+  auto GetLeafPage(const KeyType &key, page_id_t &page_id, LeafPage **page_pptr) -> bool;
+
   // return the page id of the root node
   auto GetRootPageId() -> page_id_t;
 

@@ -34,14 +34,51 @@ auto BPLUSTREE_TYPE::IsEmpty() const -> bool {
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result, Transaction *transaction) -> bool {
-  if(IsEmpty()) {
+  page_id_t l_page_id;
+  LeafPage *l_page;
+  bool get_page = GetLeafPage(key, l_page_id, &l_page);
+
+  if(!get_page) {
+    return false;
+  }
+
+  bool get_value = l_page->GetValue(key, result, comparator_);
+  buffer_pool_manager_->UnpinPage(l_page_id, false);
+  return get_value;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto BPLUSTREE_TYPE::GetLeafPage(const KeyType &key, page_id_t &leaf_page_id, LeafPage **leaf_page_pptr) -> bool {
+  if (IsEmpty()) {
     return false;
   }
 
   page_id_t page_id = root_page_id_;
-  Page * page_raw = buffer_pool_manager_->FetchPage(page_id);
-  
+  BPlusTreePage *page = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id)->GetData());
+  while (true) {
+    if (page->IsRootPage()) {
+      InternalPage *r_page = reinterpret_cast<InternalPage *>(page);
+      page_id_t temp = r_page->GetValue(key, comparator_);
+
+      buffer_pool_manager_->UnpinPage(page_id, false);
+      page_id = temp;
+      
+      page = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id)->GetData());
+    }
+    else if (page->IsLeafPage()) {
+      LeafPage *l_page = reinterpret_cast<LeafPage *>(page);
+      leaf_page_id = page_id;
+      *leaf_page_pptr = l_page;
+      return true;
+    }
+    else {
+      LOG_DEBUG("error: INVALID_INDEX_PAGE b_plus_tree.cpp");
+      buffer_pool_manager_->UnpinPage(page_id, false);
+      return false;
+    }
+  }
 }
+
 
 /*****************************************************************************
  * INSERTION
@@ -55,7 +92,50 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transaction *transaction) -> bool {
-  return false;
+  if(IsEmpty()) {
+    LOG_DEBUG("Tree is empty");
+
+    // 创建叶子节点作为根节点
+    Page *raw_root_page = buffer_pool_manager_->NewPage(&root_page_id_);
+    LeafPage* leaf_page = reinterpret_cast<LeafPage *>(raw_root_page->GetData());
+    leaf_page->Init(root_page_id_, INVALID_PAGE_ID, leaf_max_size_);
+  
+    // 在叶子节点插入KV记录
+    LOG_DEBUG("leaf_page_size: %d", leaf_page->GetSize());
+    if(!leaf_page->InsertKV(key, value, comparator_)) {
+      LOG_DEBUG("error: fail to insert KV to leaf page when create new B plus tree.");
+      return false;
+    }
+    LOG_DEBUG("leaf_page_size: %d", leaf_page->GetSize());
+    LOG_DEBUG("root_page_id: %d", root_page_id_);
+
+    // 释放page
+    buffer_pool_manager_->UnpinPage(root_page_id_, true);
+
+    // 新增root_page_id注册
+    UpdateRootPageId(1);
+
+    return true;
+  }
+  else {
+    page_id_t l_page_id;
+    LeafPage *l_page;
+    bool get_page = GetLeafPage(key, l_page_id, &l_page);
+    if(!get_page) {
+      return false;
+    }
+
+    if(l_page->IsFull()) {
+      buffer_pool_manager_->UnpinPage(l_page_id, false);
+      LOG_DEBUG("leaf page is full, need to split");
+      return false;
+    }
+    else {
+      bool insert_kv = l_page->InsertKV(key, value, comparator_);
+      buffer_pool_manager_->UnpinPage(l_page_id, true);
+      return insert_kv;
+    }
+  }
 }
 
 /*****************************************************************************
@@ -102,7 +182,9 @@ auto BPLUSTREE_TYPE::End() -> INDEXITERATOR_TYPE { return INDEXITERATOR_TYPE(); 
  * @return Page id of the root of this tree
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto BPLUSTREE_TYPE::GetRootPageId() -> page_id_t { return 0; }
+auto BPLUSTREE_TYPE::GetRootPageId() -> page_id_t { 
+  return root_page_id_; 
+}
 
 /*****************************************************************************
  * UTILITIES AND DEBUG
@@ -230,7 +312,8 @@ void BPLUSTREE_TYPE::ToGraph(BPlusTreePage *page, BufferPoolManager *bpm, std::o
     }
 
     // Print parent links if there is a parent
-    if (leaf->GetParentPageId() != INVALID_PAGE_ID) {
+    if (leaf->GetParentPageId() != INVALID_PAGE_ID) {  auto GetLeafPage(const KeyType &key, page_id_t &page_id, LeafPage **page_pptr) -> bool;
+
       out << internal_prefix << leaf->GetParentPageId() << ":p" << leaf->GetPageId() << " -> " << leaf_prefix
           << leaf->GetPageId() << ";\n";
     }

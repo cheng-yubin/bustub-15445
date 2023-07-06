@@ -28,12 +28,12 @@ namespace bustub {
  */
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_LEAF_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size) {
-  page_type_ = IndexPageType::LEAF_PAGE;
-  lsn_ = INVALID_LSN;
-  size_ = 0;
-  max_size_ = max_size;
-  parent_page_id_ = parent_id;
-  page_id_ = page_id;
+  SetPageType(IndexPageType::LEAF_PAGE);
+  SetLSN(INVALID_LSN);
+  SetSize(0);
+  SetMaxSize(max_size);
+  SetParentPageId(parent_id);
+  SetPageId(page_id);
   next_page_id_ = INVALID_PAGE_ID;
 }
 
@@ -57,9 +57,56 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::SetNextPageId(page_id_t next_page_id) {
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::KeyAt(int index) const -> KeyType {
   // replace with your own code
-  KeyType key = array_[index].first;
-  return key;
+  return array_[index].first;
 }
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::ValueAt(int index) const -> ValueType {
+  // replace with your own code
+  return array_[index].second;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result, const KeyComparator &comparator) const -> bool {
+  // TODO: linear search
+  for (int index = 0; index < GetSize(); index++) {
+    if(comparator(key, KeyAt(index)) == 0) {
+      *result = std::vector<ValueType>{ValueAt(index)};
+      return true;
+    }
+  }
+  return false;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool {
+  if(IsFull()) {
+    LOG_DEBUG("error: array is full when InsertKV, b_plus_tree_leaf_page.cpp");
+    return false;
+  }
+
+  for(int index = GetSize() - 1; index >= 0; index--) {
+    LOG_DEBUG("index = %d \n", index);
+
+    if(comparator(key, KeyAt(index)) < 0) {
+      array_[index + 1] = array_[index];
+    }
+    else {
+      array_[index + 1].first = key;
+      array_[index + 1].second = value;
+      IncreaseSize(1);
+      return true;
+    }
+  }
+  
+  LOG_DEBUG("Insert to array[0]");
+  array_[0].first = key;
+  array_[0].second = value;
+  IncreaseSize(1);
+  return true;
+}
+
+
 
 template class BPlusTreeLeafPage<GenericKey<4>, RID, GenericComparator<4>>;
 template class BPlusTreeLeafPage<GenericKey<8>, RID, GenericComparator<8>>;
