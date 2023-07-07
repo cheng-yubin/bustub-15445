@@ -58,8 +58,13 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType {
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetValueAt(int index, const ValueType &value) {
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetValueAt(int index, const ValueType &value) {
   array_[index].second = value;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ItemAt(int index) -> MappingType& {
+  return array_[index];
 }
 
 INDEX_TEMPLATE_ARGUMENTS
@@ -75,20 +80,34 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetValue(const KeyType &key, const KeyCompa
 }
 
 
-// INDEX_TEMPLATE_ARGUMENTS
-// void B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(int index, const KeyType &key, const ValueType &value) {
-//   if(IsFull()) {
-//     LOG_DEBUG("error: array is full when InsertKV, b_plus_tree_internal_page.cpp");
-//     return;
-//   }
-  
-//   for(int i = size_ - 1; i >= index; i--) {
-//     array_[i+1] = array_[i];
-//   }
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool {
+  if(IsFull()) {
+    LOG_DEBUG("error: array is full when InsertKV, b_plus_tree_leaf_page.cpp");
+    return false;
+  }
 
-//   array_[index].first = key;
-//   array_[index].second = value;
-// }
+  for(int index = GetSize() - 1; index >= 1; index--) {
+    LOG_DEBUG("index = %d \n", index);
+
+    if(comparator(key, KeyAt(index)) < 0) {
+      array_[index + 1] = array_[index];
+    }
+    else {
+      array_[index + 1].first = key;
+      array_[index + 1].second = value;
+      IncreaseSize(1);
+      return true;
+    }
+  }
+  
+  LOG_DEBUG("Insert to array[0]");
+  array_[1].first = key;
+  array_[1].second = value;
+  IncreaseSize(1);
+  return true;
+}
+
 
 
 // valuetype for internalNode should be page id_t

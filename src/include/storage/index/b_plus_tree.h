@@ -42,6 +42,8 @@ class BPlusTree {
   explicit BPlusTree(std::string name, BufferPoolManager *buffer_pool_manager, const KeyComparator &comparator,
                      int leaf_max_size = LEAF_PAGE_SIZE, int internal_max_size = INTERNAL_PAGE_SIZE);
 
+  ~BPlusTree();
+
   // Returns true if this B+ tree has no keys and values.
   auto IsEmpty() const -> bool;
 
@@ -56,6 +58,9 @@ class BPlusTree {
 
   // 对于给定key，查找对应的leaf节点
   auto GetLeafPage(const KeyType &key, page_id_t &page_id, LeafPage **page_pptr) -> bool;
+
+  // 分裂节点
+  void SplitPage(const page_id_t page_id, LeafPage *page_ptr);
 
   // return the page id of the root node
   auto GetRootPageId() -> page_id_t;
@@ -92,6 +97,8 @@ class BPlusTree {
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
+
+  std::pair<KeyType, page_id_t> *internal_array;
 };
 
 }  // namespace bustub

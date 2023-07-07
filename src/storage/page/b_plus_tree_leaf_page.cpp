@@ -67,6 +67,11 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::ValueAt(int index) const -> ValueType {
 }
 
 INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::ItemAt(int index) -> MappingType & {
+  return array_[index];
+}
+
+INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result, const KeyComparator &comparator) const -> bool {
   // TODO: linear search
   for (int index = 0; index < GetSize(); index++) {
@@ -80,14 +85,21 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::GetValue(const KeyType &key, std::vector<ValueT
 
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool {
-  if(IsFull()) {
+  // 叶子节点满，插入失败
+  if (IsFull()) {
     LOG_DEBUG("error: array is full when InsertKV, b_plus_tree_leaf_page.cpp");
     return false;
   }
 
-  for(int index = GetSize() - 1; index >= 0; index--) {
-    LOG_DEBUG("index = %d \n", index);
+  // 已有相同的key,插入失败
+  for (int index = 0; index < GetSize(); index++) {
+    if (comparator(key, KeyAt(index)) == 0) {
+      return false;
+    }
+  }
 
+  // 元素后移，有序插入
+  for(int index = GetSize() - 1; index >= 0; index--) {
     if(comparator(key, KeyAt(index)) < 0) {
       array_[index + 1] = array_[index];
     }
@@ -99,7 +111,6 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &v
     }
   }
   
-  LOG_DEBUG("Insert to array[0]");
   array_[0].first = key;
   array_[0].second = value;
   IncreaseSize(1);

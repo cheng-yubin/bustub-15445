@@ -48,8 +48,11 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   // helper methods
   auto GetNextPageId() const -> page_id_t;
   void SetNextPageId(page_id_t next_page_id);
+
   auto KeyAt(int index) const -> KeyType;
   auto ValueAt(int index) const -> ValueType;
+
+  auto ItemAt(int index) -> MappingType &;
 
   // 已知key,查找value
   auto GetValue(const KeyType &key, std::vector<ValueType> *result, const KeyComparator &comparator) const -> bool;

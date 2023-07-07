@@ -15,8 +15,14 @@ BPLUSTREE_TYPE::BPlusTree(std::string name, BufferPoolManager *buffer_pool_manag
       buffer_pool_manager_(buffer_pool_manager),
       comparator_(comparator),
       leaf_max_size_(leaf_max_size),
-      internal_max_size_(internal_max_size) {}
+      internal_max_size_(internal_max_size) {
+        internal_array = new std::pair<KeyType, page_id_t>[internal_max_size + 1];
+      }
 
+INDEX_TEMPLATE_ARGUMENTS
+BPLUSTREE_TYPE::~BPlusTree() {
+  delete [] internal_array;
+}
 /*
  * Helper function to decide whether current b+tree is empty
  */
@@ -92,24 +98,22 @@ auto BPLUSTREE_TYPE::GetLeafPage(const KeyType &key, page_id_t &leaf_page_id, Le
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transaction *transaction) -> bool {
+  // 树空，创建树
   if(IsEmpty()) {
-    LOG_DEBUG("Tree is empty");
+    LOG_DEBUG("Tree is empty, create a tree");
 
     // 创建叶子节点作为根节点
     Page *raw_root_page = buffer_pool_manager_->NewPage(&root_page_id_);
     LeafPage* leaf_page = reinterpret_cast<LeafPage *>(raw_root_page->GetData());
     leaf_page->Init(root_page_id_, INVALID_PAGE_ID, leaf_max_size_);
   
-    // 在叶子节点插入KV记录
-    LOG_DEBUG("leaf_page_size: %d", leaf_page->GetSize());
+    // 在叶子节点插入KV记录,修改size
     if(!leaf_page->InsertKV(key, value, comparator_)) {
       LOG_DEBUG("error: fail to insert KV to leaf page when create new B plus tree.");
       return false;
     }
-    LOG_DEBUG("leaf_page_size: %d", leaf_page->GetSize());
-    LOG_DEBUG("root_page_id: %d", root_page_id_);
 
-    // 释放page
+    // 释放page,需要写入
     buffer_pool_manager_->UnpinPage(root_page_id_, true);
 
     // 新增root_page_id注册
@@ -117,7 +121,9 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
 
     return true;
   }
+  // 已有树，插入
   else {
+    // 根据key找到对应的leaf page
     page_id_t l_page_id;
     LeafPage *l_page;
     bool get_page = GetLeafPage(key, l_page_id, &l_page);
@@ -125,17 +131,173 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
       return false;
     }
 
-    if(l_page->IsFull()) {
-      buffer_pool_manager_->UnpinPage(l_page_id, false);
-      LOG_DEBUG("leaf page is full, need to split");
+    // 插入数据
+    bool insert_kv = l_page->InsertKV(key, value, comparator_);
+    // 插入失败
+    if(!insert_kv) {
+      buffer_pool_manager_->UnpinPage(l_page_id, true);
+      LOG_DEBUG("error: insert key failed.");
       return false;
     }
+
+    // 插入成功后叶子节点满，需要分裂
+    if(l_page->IsFull()) {
+      LOG_DEBUG("leaf page is full, start to split.");
+      SplitPage(l_page_id, l_page);
+    }
     else {
-      bool insert_kv = l_page->InsertKV(key, value, comparator_);
+      LOG_DEBUG("not need to split, size = %d", l_page->GetSize());
       buffer_pool_manager_->UnpinPage(l_page_id, true);
-      return insert_kv;
+    }
+
+    return insert_kv;
+  }
+}
+
+
+
+INDEX_TEMPLATE_ARGUMENTS
+void BPLUSTREE_TYPE::SplitPage(const page_id_t page_id, LeafPage *page_ptr) {
+  // 新的叶子节点
+  page_id_t new_leaf_page_id;
+  LeafPage* new_leaf_page_ptr = reinterpret_cast<LeafPage *>(buffer_pool_manager_->NewPage(&new_leaf_page_id)->GetData());
+  new_leaf_page_ptr->Init(new_leaf_page_id, INVALID_PAGE_ID, leaf_max_size_);
+
+  // 分配叶子节点kv
+  int min_size = page_ptr->GetMinSize();
+  int size = page_ptr->GetSize();
+  for(int i = 0; i < size - min_size; i++) {
+    new_leaf_page_ptr->ItemAt(i) = page_ptr->ItemAt(min_size + i);
+  }
+  page_ptr->SetSize(min_size);
+  new_leaf_page_ptr->SetSize(size - min_size);
+  page_ptr->SetNextPageId(new_leaf_page_id);
+  
+  // 回溯修改内部节点
+  page_id_t parent_page_id = page_ptr->GetParentPageId(); // 父节点
+  KeyType key = new_leaf_page_ptr->KeyAt(0);
+  // page_id_t old_child_page_id = page_id;                // 原先的放不下的节点
+  BPlusTreePage* old_child_ptr = page_ptr;
+  BPlusTreePage* child_page_ptr = new_leaf_page_ptr;    // 新创建的节点
+
+  InternalPage* parent_page_ptr;
+
+  while(true) {
+    // 根节点满，需要增加一层，更新根节点
+    if(parent_page_id == INVALID_PAGE_ID) {
+      LOG_DEBUG("create new root page");
+      // 新创建一个根节点并初始化
+      parent_page_ptr = reinterpret_cast<InternalPage *>(buffer_pool_manager_->NewPage(&root_page_id_)->GetData());
+      parent_page_ptr->Init(root_page_id_, INVALID_PAGE_ID, internal_max_size_);
+      
+      // 设置KV
+      parent_page_ptr->SetKeyAt(1, key);
+      parent_page_ptr->SetValueAt(0, old_child_ptr->GetPageId());
+      parent_page_ptr->SetValueAt(1, child_page_ptr->GetPageId());
+      parent_page_ptr->SetSize(2);
+
+      // 设置父节点
+      old_child_ptr->SetParentPageId(root_page_id_);
+      child_page_ptr->SetParentPageId(root_page_id_);
+
+      // 对page解除锁定
+      buffer_pool_manager_->UnpinPage(old_child_ptr->GetPageId(), true);
+      buffer_pool_manager_->UnpinPage(root_page_id_, true);
+      buffer_pool_manager_->UnpinPage(child_page_ptr->GetPageId(), true);
+
+      // 更新根节点
+      UpdateRootPageId(0);
+
+      // 退出循环
+      break;
+    }
+    // 非根节点
+    else {
+      LOG_DEBUG("parent page is not full");
+      parent_page_ptr = reinterpret_cast<InternalPage *>(buffer_pool_manager_->FetchPage(parent_page_id)->GetData());
+
+      // 父节点未满，可直接插入
+      if(!parent_page_ptr->IsFull()) {
+        // 向父节点插入KV, 设置size
+        parent_page_ptr->InsertKV(key, child_page_ptr->GetPageId(), comparator_);
+
+        // 设置父节点
+        child_page_ptr->SetParentPageId(parent_page_id);
+
+        // 对page解除锁定
+        buffer_pool_manager_->UnpinPage(old_child_ptr->GetPageId(), true);
+        buffer_pool_manager_->UnpinPage(parent_page_id, true);
+        buffer_pool_manager_->UnpinPage(child_page_ptr->GetPageId(), true);
+
+        // 退出循环
+        break;
+      }
+      // 父节点满，需要分裂
+      else {
+        LOG_DEBUG("parent page is full");
+        // 新的内部节点，即父节点的兄弟节点
+        page_id_t new_inter_page_id;
+        InternalPage* new_inter_page_ptr = reinterpret_cast<InternalPage *>(buffer_pool_manager_->NewPage(&new_inter_page_id)->GetData());
+        new_inter_page_ptr->Init(new_inter_page_id, INVALID_PAGE_ID, internal_max_size_);
+
+        // 将新的子结点的KV对添加到父节点KV序列中，由于父节点已满，临时使用internal_array数组进行保存
+        internal_array[0] = parent_page_ptr->ItemAt(0);             // 空key
+        int i = 1;
+        int j = 1;
+        int array_size = parent_page_ptr->GetSize() + 1;
+
+        for( ; i < array_size - 1; i++) {               // 小于key的部分    
+          if(comparator_(key, parent_page_ptr->KeyAt(i)) < 0) {
+            break;
+          }
+          internal_array[j++] = parent_page_ptr->ItemAt(i);
+        }
+
+        internal_array[j++] = std::pair<KeyType, page_id_t>(key, child_page_ptr->GetPageId());  // 插入key
+        
+        for( ; i < array_size - 1; i++) {               // 大于key的部分
+          internal_array[j++] = parent_page_ptr->ItemAt(i);
+        }
+
+        // 选取传递到更上层的new_key
+        int mid_index = array_size / 2;
+        KeyType new_key = internal_array[mid_index].first;
+
+        // 父节点临时设置为parent_page_id，统一处理
+        child_page_ptr->SetParentPageId(parent_page_id);
+        
+        // 子结点完成设置，可以解除锁定
+        buffer_pool_manager_->UnpinPage(old_child_ptr->GetPageId(), true);
+        buffer_pool_manager_->UnpinPage(child_page_ptr->GetPageId(), true);
+
+        // 向原父节点和新父节点划分KV，重新设置size，新节点的子结点重新设置parenetID
+        for(int i = 0; i < mid_index; i++) {
+          parent_page_ptr->ItemAt(i) = internal_array[i];
+        }
+
+        parent_page_ptr->SetSize(mid_index);
+
+        for(int i = mid_index; i < array_size; i++) {
+          new_inter_page_ptr->ItemAt(i - mid_index) = internal_array[i];
+
+          InternalPage * temp_ptr = reinterpret_cast<InternalPage *>(buffer_pool_manager_->FetchPage(new_inter_page_ptr->ValueAt(i - mid_index))->GetData());
+          temp_ptr->SetParentPageId(new_inter_page_id);
+          buffer_pool_manager_->UnpinPage(new_inter_page_ptr->ValueAt(i - mid_index), true);
+        }
+        new_inter_page_ptr->SetSize(array_size - mid_index);
+        
+        // 更新状态量，进入更上层循环
+        old_child_ptr = parent_page_ptr;                            // 原父节点
+        parent_page_id = parent_page_ptr->GetParentPageId();        // 上一层父节点
+        key = new_key;
+        child_page_ptr = new_inter_page_ptr;                        // 新节点
+
+        // 原父节点解除锁定
+        // buffer_pool_manager_->UnpinPage(parent_page_ptr->GetPageId(), true);
+      }
     }
   }
+
 }
 
 /*****************************************************************************
