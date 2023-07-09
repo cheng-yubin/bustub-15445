@@ -46,11 +46,21 @@ class BPlusTreeInternalPage : public BPlusTreePage {
 
   auto ItemAt(int index) -> MappingType&;
 
+  // 已知value,修改key
+  auto FindValue(const ValueType &value) -> int;
+
   // 已知key，查找value
   auto GetValue(const KeyType &key, const KeyComparator &comparator) const -> ValueType;
-
+  
+  // 插入KV
   auto InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool;
   
+  // 查找左右兄弟节点
+  void GetSibling(const ValueType &value, ValueType &left_sibling, ValueType &right_sibling, const KeyComparator &comparator);
+
+  // 删除KV
+  auto RemoveKV(const int index) -> bool;
+
  private:
   // Flexible array member for page data.
   MappingType array_[INTERNAL_PAGE_SIZE];

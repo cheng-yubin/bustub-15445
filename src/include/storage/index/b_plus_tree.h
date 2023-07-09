@@ -62,6 +62,16 @@ class BPlusTree {
   // 分裂节点
   void SplitPage(const page_id_t page_id, LeafPage *page_ptr);
 
+  // 节点重分布
+  void RedistributePage(LeafPage *page_ptr);
+
+  // 从兄弟节点借KV
+  auto BorrowFromSibling(BPlusTreePage* page_ptr, InternalPage *parent_page_ptr) -> bool;
+  
+  // 合并节点
+  void Merge(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr);
+  void MergePage(BPlusTreePage *left_page_ptr, BPlusTreePage *right_page_ptr, InternalPage *parent_page_ptr);
+  
   // return the page id of the root node
   auto GetRootPageId() -> page_id_t;
 

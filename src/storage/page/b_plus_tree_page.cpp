@@ -45,7 +45,7 @@ auto BPlusTreePage::IsFull() const -> bool {
     return size_ >= max_size_;
 }
 
-auto BPlusTreePage::LessThanHalf() const -> bool {
+auto BPlusTreePage::Downflow() const -> bool {
     return size_ < max_size_ / 2;
 }
 
@@ -64,7 +64,14 @@ void BPlusTreePage::SetMaxSize(int size) {
  * Generally, min page size == max page size / 2
  */
 auto BPlusTreePage::GetMinSize() const -> int { 
-    return max_size_ / 2; 
+    // 对于内部节点，向上取整
+    if (IsRootPage()) {
+        return (max_size_ + 1) / 2;
+    }
+    // 对于叶子节点，向下取整
+    else {
+        return max_size_ / 2; 
+    }
 }
 
 /*

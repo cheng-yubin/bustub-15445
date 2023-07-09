@@ -60,6 +60,10 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   // 插入KV
   auto InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool;
 
+  // 删除key
+  auto RemoveKey(const KeyType &key, const KeyComparator &comparator) -> bool;
+
+  
  private:
   page_id_t next_page_id_;
   // Flexible array member for page data.

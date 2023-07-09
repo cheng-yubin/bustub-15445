@@ -51,7 +51,7 @@ class BPlusTreePage {
   void SetSize(int size);
   void IncreaseSize(int amount);
   auto IsFull() const -> bool;
-  auto LessThanHalf() const -> bool;
+  auto Downflow() const -> bool;
 
   auto GetMaxSize() const -> int;
   void SetMaxSize(int max_size);

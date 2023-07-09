@@ -79,6 +79,15 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetValue(const KeyType &key, const KeyCompa
   return value;
 }
 
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::FindValue(const ValueType &value) -> int {
+  for(int i = 0; i < GetSize(); i++) {
+    if(ValueAt(i) == value) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool {
@@ -105,6 +114,33 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(const KeyType &key, const ValueTyp
   array_[1].first = key;
   array_[1].second = value;
   IncreaseSize(1);
+  return true;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetSibling(const ValueType &value, ValueType &left_sibling, ValueType &right_sibling, const KeyComparator &comparator) {
+  int index = 0;
+  for(; index < GetSize(); index++) {
+    if(value == ValueAt(index)) {
+      break;
+    }
+  }
+  
+  left_sibling = index > 0 ? ValueAt(index - 1) : INVALID_PAGE_ID;
+  right_sibling = index < (GetSize() - 1) ? ValueAt(index + 1) : INVALID_PAGE_ID;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::RemoveKV(const int index) -> bool {
+  if (index >= GetSize()) {
+    LOG_DEBUG("index overflow.");
+    return false;
+  }
+
+  for (int i = index; i < GetSize() - 1; i++) {
+    array_[i] = array_[i + 1];
+  } 
+  IncreaseSize(-1);
   return true;
 }
 

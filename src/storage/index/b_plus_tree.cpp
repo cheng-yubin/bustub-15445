@@ -311,7 +311,318 @@ void BPLUSTREE_TYPE::SplitPage(const page_id_t page_id, LeafPage *page_ptr) {
  * necessary.
  */
 INDEX_TEMPLATE_ARGUMENTS
-void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {}
+void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
+  // 树为空，返回
+  if(IsEmpty()) {
+    return;
+  }
+
+  // key所在叶子节点
+  page_id_t l_page_id;
+  LeafPage *l_page;
+  bool get_page = GetLeafPage(key, l_page_id, &l_page);
+  if(!get_page) {
+    return;
+  }
+  
+  // 删除key,删除的key为第一个时，没有更新父节点索引
+  bool remove_key = l_page->RemoveKey(key, comparator_);
+  if(!remove_key) {   // 没找到对应key
+    return;
+  }
+  LOG_DEBUG("removed from leaf page.");
+
+  // 检查是否需要合并
+  if(l_page->Downflow()) {
+    LOG_DEBUG("Need to Redistribution.");
+    RedistributePage(l_page);
+    LOG_DEBUG("redistribution end. \n");
+  }
+  else {
+      LOG_DEBUG("No need to Redistribution.");
+  }
+}
+
+
+INDEX_TEMPLATE_ARGUMENTS
+void BPLUSTREE_TYPE::RedistributePage(LeafPage *leaf_ptr) {
+
+  BPlusTreePage* page_ptr = leaf_ptr;
+  page_id_t parent_page_id = page_ptr->GetParentPageId();
+  InternalPage *parent_page_ptr; 
+  
+  while(true) {
+    // 根节点，不需要再处理
+    if(parent_page_id == INVALID_PAGE_ID) {
+      LOG_DEBUG("parent is root page.");
+
+      buffer_pool_manager_->UnpinPage(page_ptr->GetPageId(), false);
+      break;
+    }
+    parent_page_ptr = reinterpret_cast<InternalPage *>(buffer_pool_manager_->FetchPage(parent_page_id)->GetData());
+
+    // 从兄弟节点借，不会导致更上层变更
+    bool borrow = BorrowFromSibling(page_ptr, parent_page_ptr);
+    if(borrow) {
+      LOG_DEBUG("borrow from sibling succuss.");
+      buffer_pool_manager_->UnpinPage(page_ptr->GetPageId(), true);
+      buffer_pool_manager_->UnpinPage(parent_page_ptr->GetPageId(), true);
+      break;
+    }
+    
+    // 无法借到，合并节点
+    LOG_DEBUG("start to merge.");
+    Merge(page_ptr, parent_page_ptr);
+    
+    // 判断合并后父节点状态
+    int parent_size = parent_page_ptr->GetSize();
+    
+    // 需要修改根节点
+    if(parent_size == 1 && parent_page_ptr->GetParentPageId() == INVALID_PAGE_ID) {
+      LOG_DEBUG("need to lower the tree.");
+      // 修改root节点
+      page_id_t p_id = parent_page_ptr->ValueAt(0);
+      BPlusTreePage *ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(p_id)->GetData());
+      ptr->SetParentPageId(INVALID_PAGE_ID);
+      buffer_pool_manager_->UnpinPage(p_id, true);
+
+      root_page_id_ = p_id;
+      UpdateRootPageId();
+
+      // 解除锁定
+      buffer_pool_manager_->UnpinPage(page_ptr->GetPageId(), true);
+      buffer_pool_manager_->UnpinPage(parent_page_ptr->GetPageId(), true);
+      break;
+    }
+    // 需要继续合并
+    else if(parent_size < parent_page_ptr->GetMinSize()) {
+      LOG_DEBUG("need to continue to merge.");
+      buffer_pool_manager_->UnpinPage(page_ptr->GetPageId(), true);
+
+      // 修改状态变量
+      page_ptr = parent_page_ptr;
+      parent_page_id = page_ptr->GetParentPageId();
+    }
+    else {
+      // 解除锁定
+      buffer_pool_manager_->UnpinPage(page_ptr->GetPageId(), true);
+      buffer_pool_manager_->UnpinPage(parent_page_ptr->GetPageId(), true);
+      break;
+    }
+  }
+}
+
+
+INDEX_TEMPLATE_ARGUMENTS
+auto BPLUSTREE_TYPE::BorrowFromSibling(BPlusTreePage* page_ptr, InternalPage *parent_page_ptr) -> bool {
+  page_id_t left_sibling_id, right_sibling_id;
+  BPlusTreePage *left_sibling_ptr, *right_sibling_ptr;
+  parent_page_ptr->GetSibling(page_ptr->GetPageId(), left_sibling_id, right_sibling_id, comparator_);
+
+  // 有左兄弟
+  if (left_sibling_id != INVALID_PAGE_ID) {
+    left_sibling_ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(left_sibling_id)->GetData());
+    int left_size = left_sibling_ptr->GetSize();
+
+    // 能借出最后一个KV
+    if (left_size > left_sibling_ptr->GetMinSize()) {
+      // 叶子节点
+      if (page_ptr->IsLeafPage()) {
+        LeafPage *leaf_ptr = static_cast<LeafPage *>(page_ptr);
+        LeafPage *left_leaf_ptr = static_cast<LeafPage *>(left_sibling_ptr);
+        
+        // 左兄弟的最后一个KV
+        leaf_ptr->InsertKV(left_leaf_ptr->KeyAt(left_size - 1), left_leaf_ptr->ValueAt(left_size - 1), comparator_);
+        left_leaf_ptr->IncreaseSize(-1);
+
+        // 更新父节点中本page对应的key,由于向左兄弟借的，因此page_id不可能是0 
+        int index = parent_page_ptr->FindValue(leaf_ptr->GetPageId());
+        parent_page_ptr->SetKeyAt(index, leaf_ptr->KeyAt(0));
+
+        // 解除锁定
+        buffer_pool_manager_->UnpinPage(left_leaf_ptr->GetPageId(), true);
+      }
+      // 内部节点
+      else if(page_ptr->IsRootPage()) {
+        InternalPage *inter_ptr = static_cast<InternalPage *>(page_ptr);
+        InternalPage *left_inter_ptr = static_cast<InternalPage *>(left_sibling_ptr);
+
+        // 修改被移动项的父节点
+        page_id_t p_id = left_inter_ptr->ValueAt(left_size - 1);
+        BPlusTreePage* ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(p_id)->GetData());
+        ptr->SetParentPageId(inter_ptr->GetPageId());
+        buffer_pool_manager_->UnpinPage(p_id, true);
+
+        // 更新key
+        int index = parent_page_ptr->FindValue(inter_ptr->GetPageId());
+        inter_ptr->SetKeyAt(0, parent_page_ptr->KeyAt(index));
+
+        inter_ptr->InsertKV(left_inter_ptr->KeyAt(left_size - 1), left_inter_ptr->ValueAt(left_size - 1), comparator_);
+        left_inter_ptr->IncreaseSize(-1);
+
+        parent_page_ptr->SetKeyAt(index, inter_ptr->KeyAt(0));
+
+        // 解除锁定
+        buffer_pool_manager_->UnpinPage(left_inter_ptr->GetPageId(), true);
+      }
+      else {
+        LOG_DEBUG("page type invalid.");
+      }
+      return true;
+    }
+    // 不能借出
+    buffer_pool_manager_->UnpinPage(left_sibling_id, false);
+  }
+
+  // 
+  if (right_sibling_id != INVALID_PAGE_ID) {
+    right_sibling_ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(right_sibling_id)->GetData());
+    int right_size = right_sibling_ptr->GetSize();
+
+    // 能借出第一个KV
+    if (right_size > right_sibling_ptr->GetMinSize()) {
+      // 叶子节点
+      if (page_ptr->IsLeafPage()) {
+        LeafPage *leaf_ptr = static_cast<LeafPage *>(page_ptr);
+        LeafPage *right_leaf_ptr = static_cast<LeafPage *>(right_sibling_ptr);
+        
+        // 右兄弟的一个KV
+        leaf_ptr->ItemAt(leaf_ptr->GetSize()) = right_leaf_ptr->ItemAt(0);
+        leaf_ptr->IncreaseSize(1);
+        right_leaf_ptr->RemoveKey(right_leaf_ptr->KeyAt(0), comparator_);  
+
+        // 更新父节点中右兄弟对应的key
+        int index = parent_page_ptr->FindValue(right_leaf_ptr->GetPageId());
+        parent_page_ptr->SetKeyAt(index, right_leaf_ptr->KeyAt(0));
+
+        // 解除锁定
+        buffer_pool_manager_->UnpinPage(right_leaf_ptr->GetPageId(), true);
+      }
+
+      // 内部节点
+      else if(page_ptr->IsRootPage()) {
+        InternalPage *inter_ptr = static_cast<InternalPage *>(page_ptr);
+        InternalPage *right_inter_ptr = static_cast<InternalPage *>(right_sibling_ptr);
+
+        // 修改被移动项的父节点
+        page_id_t p_id = right_inter_ptr->ValueAt(0);
+        BPlusTreePage* ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(p_id)->GetData());
+        ptr->SetParentPageId(inter_ptr->GetPageId());
+        buffer_pool_manager_->UnpinPage(p_id, true);
+
+        // 更新key
+        int index = parent_page_ptr->FindValue(right_inter_ptr->GetPageId());
+        right_inter_ptr->SetKeyAt(0, parent_page_ptr->KeyAt(index));
+
+        inter_ptr->ItemAt(inter_ptr->GetSize()) = right_inter_ptr->ItemAt(0);
+        inter_ptr->IncreaseSize(1);
+        right_inter_ptr->RemoveKV(0);
+
+        parent_page_ptr->SetKeyAt(index, right_inter_ptr->KeyAt(0));
+
+        // 解除锁定
+        buffer_pool_manager_->UnpinPage(right_inter_ptr->GetPageId(), true);
+      }
+      else {
+        LOG_DEBUG("page type invalid.");
+      }
+      return true;
+    }
+    // 不能借出
+    buffer_pool_manager_->UnpinPage(left_sibling_id, false);
+  }
+  return false;
+}
+
+
+INDEX_TEMPLATE_ARGUMENTS
+void BPLUSTREE_TYPE::Merge(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr) {
+  page_id_t left_sibling_id, right_sibling_id;
+  BPlusTreePage *left_sibling_ptr, *right_sibling_ptr;
+  parent_page_ptr->GetSibling(page_ptr->GetPageId(), left_sibling_id, right_sibling_id, comparator_);
+
+  if(left_sibling_id != INVALID_PAGE_ID) {
+    LOG_DEBUG("merge wiht left sibling.");
+    left_sibling_ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(left_sibling_id)->GetData());
+    MergePage(left_sibling_ptr, page_ptr, parent_page_ptr);
+    buffer_pool_manager_->UnpinPage(left_sibling_id, true);
+    return;
+  }
+
+  if(right_sibling_id != INVALID_PAGE_ID) {
+    LOG_DEBUG("merge wiht right sibling.");
+    right_sibling_ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(right_sibling_id)->GetData());
+    MergePage(page_ptr, right_sibling_ptr, parent_page_ptr);
+    buffer_pool_manager_->UnpinPage(right_sibling_id, true);
+    return;
+  }
+
+  LOG_DEBUG("merge error");
+}
+
+
+INDEX_TEMPLATE_ARGUMENTS
+void BPLUSTREE_TYPE::MergePage(BPlusTreePage *left_page_ptr, BPlusTreePage *right_page_ptr, InternalPage *parent_page_ptr) {
+  
+  int left_size = left_page_ptr->GetSize();
+  int right_size = right_page_ptr->GetSize();
+  BUSTUB_ASSERT(left_size + right_size <= left_page_ptr->GetMaxSize(), "size overflow");
+
+  // 合并叶子节点
+  if (left_page_ptr->IsLeafPage()) {
+    LeafPage *left_leaf_ptr = static_cast<LeafPage*>(left_page_ptr);
+    LeafPage *right_leaf_ptr = static_cast<LeafPage*>(right_page_ptr);
+
+    // 复制KV
+    for(int i = left_size; i < left_size + right_size; i++) {
+      left_leaf_ptr->ItemAt(i) = right_leaf_ptr->ItemAt(i - left_size);
+    }
+    left_leaf_ptr->IncreaseSize(right_size);
+
+    // 修改下一页id
+    left_leaf_ptr->SetNextPageId(right_leaf_ptr->GetNextPageId());
+    
+    // 删除右叶子节点在父节点中的KV
+    int index = parent_page_ptr->FindValue(right_leaf_ptr->GetPageId());
+    parent_page_ptr->RemoveKV(index);
+
+    // 返回
+    return;
+  }
+
+  // 合并内部节点
+  if (left_page_ptr->IsRootPage()) {
+    InternalPage *left_inter_ptr = static_cast<InternalPage *>(left_page_ptr);
+    InternalPage *right_inter_ptr = static_cast<InternalPage *>(right_page_ptr);
+
+    // 修改子结点的parent_id
+    page_id_t left_inter_id = left_inter_ptr->GetPageId();
+    for (int i = 0; i < right_size; i++) {
+      page_id_t p_id = right_inter_ptr->ValueAt(i);
+      BPlusTreePage* ptr =  reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(p_id)->GetData());
+      ptr->SetParentPageId(left_inter_id);
+      buffer_pool_manager_->UnpinPage(p_id, true);
+    }
+
+    // 复制KV
+    int index = parent_page_ptr->FindValue(right_inter_ptr->GetPageId());
+    right_inter_ptr->KeyAt(0) = parent_page_ptr->KeyAt(index);
+    
+    for (int i = left_size; i < left_size + right_size; i++) {
+      left_inter_ptr->ItemAt(i) = right_inter_ptr->ItemAt(i - left_size);
+    }
+    left_inter_ptr->IncreaseSize(right_size);
+
+    // 删除右内部节点在父节点中KV
+    parent_page_ptr->RemoveKV(index);
+
+    // 返回
+    return;
+  }
+
+  LOG_DEBUG("page type invalid.");
+}
+
 
 /*****************************************************************************
  * INDEX ITERATOR

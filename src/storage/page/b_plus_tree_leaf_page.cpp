@@ -117,7 +117,27 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &v
   return true;
 }
 
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::RemoveKey(const KeyType &key, const KeyComparator &comparator) -> bool {
+  int index = 0;
+  for(; index < GetSize(); index++) {
+    if(comparator(key, KeyAt(index)) == 0) {
+      break;
+    }
+  }
 
+  // 若没有找到对应的key，返回false
+  if(index == GetSize()) {
+    return false;
+  }
+
+  // 删除对应的key
+  for(; index < GetSize() - 1; index++) {
+    array_[index] = array_[index + 1];
+  }
+  IncreaseSize(-1);
+  return true;
+}
 
 template class BPlusTreeLeafPage<GenericKey<4>, RID, GenericComparator<4>>;
 template class BPlusTreeLeafPage<GenericKey<8>, RID, GenericComparator<8>>;
