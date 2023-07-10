@@ -165,38 +165,40 @@ TEST(BPlusTreeTests, InsertTest3) {
     tree.Insert(index_key, rid, transaction);
   }
 
-  // std::vector<RID> rids;
-  // for (auto key : keys) {
-  //   rids.clear();
-  //   index_key.SetFromInteger(key);
-  //   tree.GetValue(index_key, &rids);
-  //   EXPECT_EQ(rids.size(), 1);
+  std::vector<RID> rids;
+  for (auto key : keys) {
+    rids.clear();
+    index_key.SetFromInteger(key);
+    tree.GetValue(index_key, &rids);
+    EXPECT_EQ(rids.size(), 1);
 
-  //   int64_t value = key & 0xFFFFFFFF;
-  //   EXPECT_EQ(rids[0].GetSlotNum(), value);
-  // }
+    int64_t value = key & 0xFFFFFFFF;
+    EXPECT_EQ(rids[0].GetSlotNum(), value);
+  }
 
-  // int64_t start_key = 1;
-  // int64_t current_key = start_key;
-  // index_key.SetFromInteger(start_key);
-  // for (auto iterator = tree.Begin(index_key); iterator != tree.End(); ++iterator) {
-  //   auto location = (*iterator).second;
-  //   EXPECT_EQ(location.GetPageId(), 0);
-  //   EXPECT_EQ(location.GetSlotNum(), current_key);
-  //   current_key = current_key + 1;
-  // }
+  int64_t start_key = 1;
+  int64_t current_key = start_key;
+  index_key.SetFromInteger(start_key);
 
-  // EXPECT_EQ(current_key, keys.size() + 1);
+  for (auto iterator = tree.Begin(index_key); iterator != tree.End(); ++iterator) {
+    iterator.debug_info();
+    auto location = (*iterator).second;
+    EXPECT_EQ(location.GetPageId(), 0);
+    EXPECT_EQ(location.GetSlotNum(), current_key);
+    current_key = current_key + 1;
+  }
 
-  // start_key = 3;
-  // current_key = start_key;
-  // index_key.SetFromInteger(start_key);
-  // for (auto iterator = tree.Begin(index_key); iterator != tree.End(); ++iterator) {
-  //   auto location = (*iterator).second;
-  //   EXPECT_EQ(location.GetPageId(), 0);
-  //   EXPECT_EQ(location.GetSlotNum(), current_key);
-  //   current_key = current_key + 1;
-  // }
+  EXPECT_EQ(current_key, keys.size() + 1);
+
+  start_key = 3;
+  current_key = start_key;
+  index_key.SetFromInteger(start_key);
+  for (auto iterator = tree.Begin(index_key); iterator != tree.End(); ++iterator) {
+    auto location = (*iterator).second;
+    EXPECT_EQ(location.GetPageId(), 0);
+    EXPECT_EQ(location.GetSlotNum(), current_key);
+    current_key = current_key + 1;
+  }
 
   bpm->UnpinPage(HEADER_PAGE_ID, true);
   delete transaction;

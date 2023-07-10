@@ -610,7 +610,37 @@ void BPLUSTREE_TYPE::MergePage(BPlusTreePage *left_page_ptr, BPlusTreePage *righ
  * @return : index iterator
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto BPLUSTREE_TYPE::Begin() -> INDEXITERATOR_TYPE { return INDEXITERATOR_TYPE(); }
+auto BPLUSTREE_TYPE::Begin() -> INDEXITERATOR_TYPE {
+  if(IsEmpty()) {
+    LOG_DEBUG("Tree is empty.");
+    return INDEXITERATOR_TYPE();
+  }
+
+  page_id_t page_id = root_page_id_;
+  auto page = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id)->GetData());
+  while (true) {
+    if (page->IsRootPage()) {
+      auto r_page = reinterpret_cast<InternalPage *>(page);
+      page_id_t temp = r_page->ValueAt(0);
+
+      buffer_pool_manager_->UnpinPage(page_id, false);
+      page_id = temp;
+
+      page = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id)->GetData());
+
+    } else if (page->IsLeafPage()) {
+      buffer_pool_manager_->UnpinPage(page_id, false);
+      break;
+
+    } else {
+      LOG_DEBUG("error: INVALID_INDEX_PAGE b_plus_tree.cpp");
+      buffer_pool_manager_->UnpinPage(page_id, false);
+      return INDEXITERATOR_TYPE();
+    }
+  }
+
+  return INDEXITERATOR_TYPE(buffer_pool_manager_, page_id, 0);
+}
 
 /*
  * Input parameter is low key, find the leaf page that contains the input key
@@ -618,7 +648,32 @@ auto BPLUSTREE_TYPE::Begin() -> INDEXITERATOR_TYPE { return INDEXITERATOR_TYPE()
  * @return : index iterator
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto BPLUSTREE_TYPE::Begin(const KeyType &key) -> INDEXITERATOR_TYPE { return INDEXITERATOR_TYPE(); }
+auto BPLUSTREE_TYPE::Begin(const KeyType &key) -> INDEXITERATOR_TYPE { 
+  LOG_DEBUG("tree.begin");
+  page_id_t page_id;
+  page_id_t next_page_id;
+  LeafPage *page_ptr;
+  int index;
+  GetLeafPage(key, page_id, &page_ptr);
+  index = page_ptr->FindKey(key, comparator_);
+  next_page_id = page_ptr->GetNextPageId();
+
+  if(index < page_ptr->GetSize()) {
+    LOG_DEBUG("tree.begin: this page, page_id = %d, index = %d",page_id, index);
+    buffer_pool_manager_->UnpinPage(page_id, false);
+    return INDEXITERATOR_TYPE(buffer_pool_manager_, page_id, index);
+  }
+
+  if(page_ptr->GetNextPageId() == INVALID_PAGE_ID) {
+    LOG_DEBUG("tree.begin: return end");
+    buffer_pool_manager_->UnpinPage(page_id, false);
+    return INDEXITERATOR_TYPE(buffer_pool_manager_, page_id, index);
+  }
+  
+  LOG_DEBUG("tree.begin: next page, index = 0");
+  buffer_pool_manager_->UnpinPage(page_id, false);
+  return INDEXITERATOR_TYPE(buffer_pool_manager_, next_page_id, 0);
+ }
 
 /*
  * Input parameter is void, construct an index iterator representing the end
@@ -626,7 +681,42 @@ auto BPLUSTREE_TYPE::Begin(const KeyType &key) -> INDEXITERATOR_TYPE { return IN
  * @return : index iterator
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto BPLUSTREE_TYPE::End() -> INDEXITERATOR_TYPE { return INDEXITERATOR_TYPE(); }
+auto BPLUSTREE_TYPE::End() -> INDEXITERATOR_TYPE { 
+  LOG_DEBUG("tree.end");
+  if(IsEmpty()) {
+    LOG_DEBUG("Tree is empty.");
+    return INDEXITERATOR_TYPE();
+  }
+
+  page_id_t page_id = root_page_id_;
+  int index_end = 0;
+  auto page = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id)->GetData());
+  while (true) {
+    if (page->IsRootPage()) {
+      auto r_page = reinterpret_cast<InternalPage *>(page);
+      index_end = r_page->GetSize() - 1;
+      page_id_t temp = r_page->ValueAt(index_end);
+
+      buffer_pool_manager_->UnpinPage(page_id, false);
+      page_id = temp;
+
+      page = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id)->GetData());
+
+    } else if (page->IsLeafPage()) {
+      index_end = page->GetSize() - 1;
+      buffer_pool_manager_->UnpinPage(page_id, false);
+      break;
+
+    } else {
+      LOG_DEBUG("error: INVALID_INDEX_PAGE b_plus_tree.cpp");
+      buffer_pool_manager_->UnpinPage(page_id, false);
+      return INDEXITERATOR_TYPE();
+    }
+  }
+  // 返回最右叶子节点的超尾
+  LOG_DEBUG("tree.end page_id = %d, index = %d", page_id, index_end + 1);
+  return INDEXITERATOR_TYPE(buffer_pool_manager_, page_id, index_end + 1);
+ }
 
 /**
  * @return Page id of the root of this tree
