@@ -41,14 +41,10 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, in
  * Helper methods to set/get next page id
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_LEAF_PAGE_TYPE::GetNextPageId() const -> page_id_t { 
-  return next_page_id_; 
-}
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::GetNextPageId() const -> page_id_t { return next_page_id_; }
 
 INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_LEAF_PAGE_TYPE::SetNextPageId(page_id_t next_page_id) {
-  next_page_id_ = next_page_id;
-}
+void B_PLUS_TREE_LEAF_PAGE_TYPE::SetNextPageId(page_id_t next_page_id) { next_page_id_ = next_page_id; }
 
 /*
  * Helper method to find and return the key associated with input "index"(a.k.a
@@ -67,15 +63,14 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::ValueAt(int index) const -> ValueType {
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_LEAF_PAGE_TYPE::ItemAt(int index) -> MappingType & {
-  return array_[index];
-}
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::ItemAt(int index) -> MappingType & { return array_[index]; }
 
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_LEAF_PAGE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result, const KeyComparator &comparator) const -> bool {
-  // TODO: linear search
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result,
+                                          const KeyComparator &comparator) const -> bool {
+  // linear search
   for (int index = 0; index < GetSize(); index++) {
-    if(comparator(key, KeyAt(index)) == 0) {
+    if (comparator(key, KeyAt(index)) == 0) {
       *result = std::vector<ValueType>{ValueAt(index)};
       return true;
     }
@@ -84,7 +79,8 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::GetValue(const KeyType &key, std::vector<ValueT
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_LEAF_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool {
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator)
+    -> bool {
   // 叶子节点满，插入失败
   if (IsFull()) {
     LOG_DEBUG("error: array is full when InsertKV, b_plus_tree_leaf_page.cpp");
@@ -99,18 +95,17 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &v
   }
 
   // 元素后移，有序插入
-  for(int index = GetSize() - 1; index >= 0; index--) {
-    if(comparator(key, KeyAt(index)) < 0) {
+  for (int index = GetSize() - 1; index >= 0; index--) {
+    if (comparator(key, KeyAt(index)) < 0) {
       array_[index + 1] = array_[index];
-    }
-    else {
+    } else {
       array_[index + 1].first = key;
       array_[index + 1].second = value;
       IncreaseSize(1);
       return true;
     }
   }
-  
+
   array_[0].first = key;
   array_[0].second = value;
   IncreaseSize(1);
@@ -120,19 +115,19 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &v
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::RemoveKey(const KeyType &key, const KeyComparator &comparator) -> bool {
   int index = 0;
-  for(; index < GetSize(); index++) {
-    if(comparator(key, KeyAt(index)) == 0) {
+  for (; index < GetSize(); index++) {
+    if (comparator(key, KeyAt(index)) == 0) {
       break;
     }
   }
 
   // 若没有找到对应的key，返回false
-  if(index == GetSize()) {
+  if (index == GetSize()) {
     return false;
   }
 
   // 删除对应的key
-  for(; index < GetSize() - 1; index++) {
+  for (; index < GetSize() - 1; index++) {
     array_[index] = array_[index + 1];
   }
   IncreaseSize(-1);

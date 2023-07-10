@@ -12,6 +12,7 @@
 
 #include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "concurrency/transaction.h"
@@ -60,18 +61,18 @@ class BPlusTree {
   auto GetLeafPage(const KeyType &key, page_id_t &page_id, LeafPage **page_pptr) -> bool;
 
   // 分裂节点
-  void SplitPage(const page_id_t page_id, LeafPage *page_ptr);
+  void SplitPage(page_id_t page_id, LeafPage *page_ptr);
 
   // 节点重分布
-  void RedistributePage(LeafPage *page_ptr);
+  void RedistributePage(LeafPage *leaf_ptr);
 
   // 从兄弟节点借KV
-  auto BorrowFromSibling(BPlusTreePage* page_ptr, InternalPage *parent_page_ptr) -> bool;
-  
+  auto BorrowFromSibling(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr) -> bool;
+
   // 合并节点
   void Merge(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr);
   void MergePage(BPlusTreePage *left_page_ptr, BPlusTreePage *right_page_ptr, InternalPage *parent_page_ptr);
-  
+
   // return the page id of the root node
   auto GetRootPageId() -> page_id_t;
 
@@ -108,7 +109,7 @@ class BPlusTree {
   int leaf_max_size_;
   int internal_max_size_;
 
-  std::pair<KeyType, page_id_t> *internal_array;
+  std::pair<KeyType, page_id_t> *internal_array_;
 };
 
 }  // namespace bustub

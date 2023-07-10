@@ -46,7 +46,7 @@ TEST(BPlusTreeTests, InsertTest1) {
   rid.Set(static_cast<int32_t>(key), value);
   index_key.SetFromInteger(key);
   tree.Insert(index_key, rid, transaction);
-  
+
   std::vector<bustub::RID> result;
   tree.GetValue(index_key, &result);
   ASSERT_EQ(result.size(), 1);
@@ -54,7 +54,7 @@ TEST(BPlusTreeTests, InsertTest1) {
   auto root_page_id = tree.GetRootPageId();
   std::cout << "root_page_id: " << root_page_id << std::endl;
   auto root_page = reinterpret_cast<BPlusTreePage *>(bpm->FetchPage(root_page_id)->GetData());
-  
+
   ASSERT_NE(root_page, nullptr);
   ASSERT_TRUE(root_page->IsLeafPage());
 

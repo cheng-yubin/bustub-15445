@@ -15,8 +15,8 @@
 #include <cstdlib>
 #include <string>
 
-#include "common/logger.h"
 #include "buffer/buffer_pool_manager.h"
+#include "common/logger.h"
 #include "storage/index/generic_key.h"
 
 namespace bustub {
