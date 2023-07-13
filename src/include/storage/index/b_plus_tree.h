@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <mutex>
 
 #include "concurrency/transaction.h"
 #include "storage/index/index_iterator.h"
@@ -38,6 +39,7 @@ INDEX_TEMPLATE_ARGUMENTS
 class BPlusTree {
   using InternalPage = BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>;
   using LeafPage = BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>;
+  using WlatchVector = std::vector<std::pair<Page *, BPlusTreePage *>>;
 
  public:
   explicit BPlusTree(std::string name, BufferPoolManager *buffer_pool_manager, const KeyComparator &comparator,
@@ -45,8 +47,14 @@ class BPlusTree {
 
   ~BPlusTree();
 
+  enum operat {
+    INSERT, REMOVE
+  };
+
   // Returns true if this B+ tree has no keys and values.
   auto IsEmpty() const -> bool;
+
+  void CreateTree();
 
   // Insert a key-value pair into this B+ tree.
   auto Insert(const KeyType &key, const ValueType &value, Transaction *transaction = nullptr) -> bool;
@@ -58,10 +66,17 @@ class BPlusTree {
   auto GetValue(const KeyType &key, std::vector<ValueType> *result, Transaction *transaction = nullptr) -> bool;
 
   // 对于给定key，查找对应的leaf节点
-  auto GetLeafPage(const KeyType &key, page_id_t &page_id, LeafPage **page_pptr) -> bool;
+  // auto GetLeafPage(const KeyType &key, page_id_t &page_id, LeafPage **page_pptr) -> bool;
+  auto GetLeafPageOptimistic(const KeyType &key, Page **raw_page_pptr, LeafPage **leaf_page_pptr,
+                             Transaction *transaction, bool rw_option = false) -> bool;
+
+  auto GetLeafPagePessimistic(const KeyType &key, Page **raw_page_pptr, LeafPage **leaf_page_pptr, 
+                              Transaction *transaction, operat op, WlatchVector &pages_wlatch) -> bool;
+
+  auto CheckSafe(BPlusTreePage *page_ptr, operat op) -> bool;
 
   // 分裂节点
-  void SplitPage(page_id_t page_id, LeafPage *page_ptr);
+  void SplitPage(page_id_t page_id);
 
   // 节点重分布
   void RedistributePage(LeafPage *leaf_ptr);
@@ -108,8 +123,8 @@ class BPlusTree {
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
-
-  std::pair<KeyType, page_id_t> *internal_array_;
+  
+  std::mutex root_mutex_;
 };
 
 }  // namespace bustub

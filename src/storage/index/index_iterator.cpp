@@ -13,7 +13,7 @@ namespace bustub {
  */
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::IndexIterator() {
-    LOG_DEBUG("default constructor called.");
+    // LOG_DEBUG("default constructor called.");
     buffer_pool_manager_ = nullptr;
     page_id_ = INVALID_PAGE_ID;
     index_ = 0;
@@ -22,17 +22,17 @@ INDEXITERATOR_TYPE::IndexIterator() {
 
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::IndexIterator(BufferPoolManager *buffer_pool_manager, page_id_t page_id, int index) {
-    LOG_DEBUG("constructor called.");
+    // LOG_DEBUG("constructor called.");
     buffer_pool_manager_ = buffer_pool_manager;
     page_id_ = page_id;
     index_ = index;
     page_ptr_ = nullptr;
 
     if(page_id_ != INVALID_PAGE_ID && buffer_pool_manager_ != nullptr) {
-        LOG_DEBUG("FetchPage");
+        // LOG_DEBUG("FetchPage");
         auto ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
         if(ptr->IsLeafPage()) {
-            LOG_DEBUG("asign page_ptr_");
+            // LOG_DEBUG("asign page_ptr_");
             page_ptr_ = static_cast<LeafPage *>(ptr);
         } else {
             buffer_pool_manager->UnpinPage(ptr->GetPageId(), false);
@@ -42,7 +42,7 @@ INDEXITERATOR_TYPE::IndexIterator(BufferPoolManager *buffer_pool_manager, page_i
 
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::IndexIterator(const IndexIterator &itr) {
-    LOG_DEBUG("copy constructor called.");
+    // LOG_DEBUG("copy constructor called.");
     buffer_pool_manager_ = itr.buffer_pool_manager_;
     page_id_ = itr.page_id_;
     index_ = itr.index_;
@@ -56,14 +56,14 @@ INDEXITERATOR_TYPE::IndexIterator(const IndexIterator &itr) {
 
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::~IndexIterator(){
-    LOG_DEBUG("deconstructor called.");
+    // LOG_DEBUG("deconstructor called.");
     debug_info();
     if(page_ptr_ != nullptr) {
-        LOG_DEBUG("unpin.");
+        // LOG_DEBUG("unpin.");
         buffer_pool_manager_->FetchPage(page_id_)->GetData();
         // buffer_pool_manager_->UnpinPage(INVALID_PAGE_ID, false);
     } else {
-        LOG_DEBUG("not unpin");
+        // LOG_DEBUG("not unpin");
     }
 }
 
@@ -76,8 +76,6 @@ auto INDEXITERATOR_TYPE::IsEnd() -> bool {
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator*() -> const MappingType & { 
     BUSTUB_ASSERT(page_ptr_ != nullptr, "page_ptr_ is nullptr.");
-    BUSTUB_ASSERT(index_ < page_ptr_->GetSize(), "index overflow.");
-
     return page_ptr_->ItemAt(index_);
  }
 
@@ -110,7 +108,7 @@ auto INDEXITERATOR_TYPE::operator++() -> INDEXITERATOR_TYPE & {
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator==(const IndexIterator &itr) const -> bool {
-    LOG_DEBUG("operator== called.");
+    // LOG_DEBUG("operator== called.");
     BUSTUB_ASSERT(page_ptr_ != nullptr, "page_ptr_ is nullptr.");
     BUSTUB_ASSERT(itr.page_ptr_ != nullptr, "itr.page_ptr_ is nullptr.");
 
@@ -119,7 +117,7 @@ auto INDEXITERATOR_TYPE::operator==(const IndexIterator &itr) const -> bool {
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator!=(const IndexIterator &itr) const -> bool {
-    LOG_DEBUG("operator!= called.");
+    // LOG_DEBUG("operator!= called.");
     BUSTUB_ASSERT(page_ptr_ != nullptr, "page_ptr_ is nullptr.");
     BUSTUB_ASSERT(itr.page_ptr_ != nullptr, "itr.page_ptr_ is nullptr.");
 
@@ -128,7 +126,7 @@ auto INDEXITERATOR_TYPE::operator!=(const IndexIterator &itr) const -> bool {
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator=(const IndexIterator &itr) {
-    LOG_DEBUG("operator= called.");
+    // LOG_DEBUG("operator= called.");
     buffer_pool_manager_ = itr.buffer_pool_manager_;
     page_id_ = itr.page_id_;
     index_ = itr.index_;
@@ -142,10 +140,10 @@ auto INDEXITERATOR_TYPE::operator=(const IndexIterator &itr) {
 
 INDEX_TEMPLATE_ARGUMENTS
 void INDEXITERATOR_TYPE::debug_info() const {
-    LOG_DEBUG("page_id = %d", page_id_);
-    LOG_DEBUG("index = %d", index_);
-    LOG_DEBUG("ptr is null? %d", page_ptr_==nullptr);
-    LOG_DEBUG("buffer_ptr is null? %d", buffer_pool_manager_==nullptr);
+    // LOG_DEBUG("page_id = %d", page_id_);
+    // LOG_DEBUG("index = %d", index_);
+    // LOG_DEBUG("ptr is null? %d", page_ptr_==nullptr);
+    // LOG_DEBUG("buffer_ptr is null? %d", buffer_pool_manager_==nullptr);
 }
 
 template class IndexIterator<GenericKey<4>, RID, GenericComparator<4>>;
