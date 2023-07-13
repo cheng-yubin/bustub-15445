@@ -137,14 +137,13 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::RemoveKey(const KeyType &key, const KeyComparat
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::FindKey(const KeyType &key, const KeyComparator &comparator) -> int {
   int index = 0;
-  for(; index < GetSize(); index++) {
-    if(comparator(key, KeyAt(index)) <= 0) {
+  for (; index < GetSize(); index++) {
+    if (comparator(key, KeyAt(index)) <= 0) {
       return index;
     }
   }
   return GetSize();
 }
-
 
 template class BPlusTreeLeafPage<GenericKey<4>, RID, GenericComparator<4>>;
 template class BPlusTreeLeafPage<GenericKey<8>, RID, GenericComparator<8>>;

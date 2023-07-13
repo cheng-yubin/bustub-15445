@@ -65,7 +65,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
 
   // 查找key
   auto FindKey(const KeyType &key, const KeyComparator &comparator) -> int;
-  
+
  private:
   page_id_t next_page_id_;
   // Flexible array member for page data.

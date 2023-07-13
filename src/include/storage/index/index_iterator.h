@@ -29,7 +29,7 @@ class IndexIterator {
   IndexIterator(BufferPoolManager *buffer_pool_manager, page_id_t page_id, int index);
   // 复制构造，深拷贝
   IndexIterator(const IndexIterator &itr);
-  
+
   ~IndexIterator();  // NOLINT
 
   auto IsEnd() -> bool;
@@ -45,7 +45,7 @@ class IndexIterator {
   // 赋值运算, 深拷贝
   auto operator=(const IndexIterator &itr);
 
-  void debug_info() const;
+  void DebugInfo() const;
 
  private:
   BufferPoolManager *buffer_pool_manager_;

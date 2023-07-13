@@ -10,11 +10,11 @@
 //===----------------------------------------------------------------------===//
 #pragma once
 
+#include <mutex>  // NOLINT
 #include <queue>
 #include <string>
 #include <utility>
 #include <vector>
-#include <mutex>
 
 #include "concurrency/transaction.h"
 #include "storage/index/index_iterator.h"
@@ -47,9 +47,7 @@ class BPlusTree {
 
   ~BPlusTree();
 
-  enum operat {
-    INSERT, REMOVE
-  };
+  enum Operat { INSERT, REMOVE };
 
   // Returns true if this B+ tree has no keys and values.
   auto IsEmpty() const -> bool;
@@ -70,10 +68,10 @@ class BPlusTree {
   auto GetLeafPageOptimistic(const KeyType &key, Page **raw_page_pptr, LeafPage **leaf_page_pptr,
                              Transaction *transaction, bool rw_option = false) -> bool;
 
-  auto GetLeafPagePessimistic(const KeyType &key, Page **raw_page_pptr, LeafPage **leaf_page_pptr, 
-                              Transaction *transaction, operat op, WlatchVector &pages_wlatch) -> bool;
+  auto GetLeafPagePessimistic(const KeyType &key, Page **raw_page_pptr, LeafPage **leaf_page_pptr,
+                              Transaction *transaction, Operat op, WlatchVector &pages_wlatch) -> bool;
 
-  auto CheckSafe(BPlusTreePage *page_ptr, operat op) -> bool;
+  auto CheckSafe(BPlusTreePage *page_ptr, Operat op) -> bool;
 
   // 分裂节点
   void SplitPage(page_id_t page_id);
@@ -123,7 +121,7 @@ class BPlusTree {
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
-  
+
   std::mutex root_mutex_;
 };
 

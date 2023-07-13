@@ -171,7 +171,7 @@ class Transaction {
         is_table_lock_set_{new std::unordered_set<table_oid_t>},
         ix_table_lock_set_{new std::unordered_set<table_oid_t>},
         six_table_lock_set_{new std::unordered_set<table_oid_t>},
-        
+
         s_row_lock_set_{new std::unordered_map<table_oid_t, std::unordered_set<RID>>},
         x_row_lock_set_{new std::unordered_map<table_oid_t, std::unordered_set<RID>>} {
     // Initialize the sets that will be tracked.

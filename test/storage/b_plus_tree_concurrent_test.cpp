@@ -171,7 +171,7 @@ TEST(BPlusTreeConcurrentTest, InsertTest2) {
     keys.push_back(key);
   }
   LaunchParallelTest(10, InsertHelperSplit, &tree, keys, 2);
-  
+
   LOG_DEBUG("draw...");
   tree.Draw(bpm, "/home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/build/concurrent_test2.dot");
 
