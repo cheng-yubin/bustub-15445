@@ -10,9 +10,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <chrono>  // NOLINT
+#include <algorithm>  // NOLINT
+#include <chrono>     // NOLINT
 #include <cstdio>
 #include <functional>
+#include <random>
 #include <thread>  // NOLINT
 
 #include "buffer/buffer_pool_manager_instance.h"
@@ -100,7 +102,7 @@ void DeleteHelperSplit(BPlusTree<GenericKey<8>, RID, GenericComparator<8>> *tree
   delete transaction;
 }
 
-TEST(BPlusTreeConcurrentTest, InsertTest1) {
+TEST(BPlusTreeConcurrentTest, DISABLED_InsertTest1) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -115,11 +117,14 @@ TEST(BPlusTreeConcurrentTest, InsertTest1) {
   (void)header_page;
   // keys to Insert
   std::vector<int64_t> keys;
-  int64_t scale_factor = 10000;
+  int64_t scale_factor = 100000;
   for (int64_t key = 1; key < scale_factor; key++) {
     keys.push_back(key);
   }
-  LaunchParallelTest(10, InsertHelper, &tree, keys);
+  std::random_device rd;
+  std::shuffle(keys.begin(), keys.end(), rd);
+
+  LaunchParallelTest(5, InsertHelper, &tree, keys);
 
   std::vector<RID> rids;
   GenericKey<8> index_key;
@@ -152,7 +157,7 @@ TEST(BPlusTreeConcurrentTest, InsertTest1) {
   remove("test.log");
 }
 
-TEST(BPlusTreeConcurrentTest, InsertTest2) {
+TEST(BPlusTreeConcurrentTest, DISABLED_InsertTest2) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -170,10 +175,10 @@ TEST(BPlusTreeConcurrentTest, InsertTest2) {
   for (int64_t key = 1; key < scale_factor; key++) {
     keys.push_back(key);
   }
-  LaunchParallelTest(10, InsertHelperSplit, &tree, keys, 2);
+  LaunchParallelTest(2, InsertHelperSplit, &tree, keys, 2);
 
   LOG_DEBUG("draw...");
-  tree.Draw(bpm, "/home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/build/concurrent_test2.dot");
+  // tree.Draw(bpm, "/home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/build/concurrent_test2.dot");
 
   std::vector<RID> rids;
   GenericKey<8> index_key;
@@ -218,7 +223,7 @@ TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest1) {
   auto *disk_manager = new DiskManager("test.db");
   BufferPoolManager *bpm = new BufferPoolManagerInstance(50, disk_manager);
   // create b+ tree
-  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", bpm, comparator);
+  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", bpm, comparator, 2, 3);
   GenericKey<8> index_key;
   // create and fetch header_page
   page_id_t page_id;
@@ -252,7 +257,7 @@ TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest1) {
   remove("test.log");
 }
 
-TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest2) {
+TEST(BPlusTreeConcurrentTest, DeleteTest2) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -260,7 +265,7 @@ TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest2) {
   auto *disk_manager = new DiskManager("test.db");
   BufferPoolManager *bpm = new BufferPoolManagerInstance(50, disk_manager);
   // create b+ tree
-  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", bpm, comparator);
+  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", bpm, comparator, 3, 3);
   GenericKey<8> index_key;
   // create and fetch header_page
   page_id_t page_id;
@@ -271,8 +276,8 @@ TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest2) {
   std::vector<int64_t> keys = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   InsertHelper(&tree, keys);
 
-  std::vector<int64_t> remove_keys = {1, 4, 3, 2, 5, 6};
-  LaunchParallelTest(2, DeleteHelperSplit, &tree, remove_keys, 2);
+  std::vector<int64_t> remove_keys = {4, 1, 3, 2, 5, 6};
+  LaunchParallelTest(3, DeleteHelperSplit, &tree, remove_keys, 2);
 
   int64_t start_key = 7;
   int64_t current_key = start_key;

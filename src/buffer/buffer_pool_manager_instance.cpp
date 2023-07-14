@@ -13,6 +13,7 @@
 #include "buffer/buffer_pool_manager_instance.h"
 
 #include "common/exception.h"
+#include "common/logger.h"
 #include "common/macros.h"
 
 namespace bustub {
@@ -38,12 +39,14 @@ BufferPoolManagerInstance::~BufferPoolManagerInstance() {
 
 auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * {
   std::scoped_lock<std::mutex> lock(latch_);
+  // LOG_DEBUG("new page called, free page num: %d", static_cast<int>(free_list_.size() + replacer_->Size()));
 
   frame_id_t frame_id;
   if (!free_list_.empty()) {
     frame_id = free_list_.back();
     free_list_.pop_back();
   } else if (!replacer_->Evict(&frame_id)) {
+    BUSTUB_ASSERT(false, "NEW PAGE FAIL.");
     return nullptr;
   }
 
@@ -74,6 +77,7 @@ auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * {
 
 auto BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) -> Page * {
   std::scoped_lock<std::mutex> lock(latch_);
+  // LOG_DEBUG("fetch page called, free page num: %d", static_cast<int>(free_list_.size() + replacer_->Size()));
 
   frame_id_t frame_id;
   if (page_table_->Find(page_id, frame_id)) {
@@ -88,6 +92,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) -> Page * {
     frame_id = free_list_.back();
     free_list_.pop_back();
   } else if (!replacer_->Evict(&frame_id)) {
+    BUSTUB_ASSERT(false, "FETCH PAGE FAIL.");
     return nullptr;
   }
 

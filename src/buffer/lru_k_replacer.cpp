@@ -14,7 +14,13 @@
 
 namespace bustub {
 
-LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(num_frames), k_(k) {}
+LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(num_frames), k_(k) {
+  for (frame_id_t i = 0; i < frame_id_t(num_frames); i++) {
+    access_cnt_[i] = 0;
+    access_hist_[i] = std::list<size_t>();
+    evictable_[i] = false;
+  }
+}
 
 auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
   std::scoped_lock<std::mutex> lock(latch_);
@@ -66,15 +72,15 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
 
   BUSTUB_ASSERT(replacer_size_ - frame_id > 0, "required frame_id is larger than up bound");
 
-  access_cnt_[frame_id] += 1;
-  access_hist_[frame_id].push_back(curr_timestamp_++);
+  access_cnt_[frame_id] += 1;                           // 5
+  access_hist_[frame_id].push_back(curr_timestamp_++);  // 1
 
   size_t cnt = access_cnt_[frame_id];
   if (cnt == 1) {
-    frames_new_.push_back(frame_id);
-    locale_new_[frame_id] = std::prev(frames_new_.end());
+    frames_new_.push_back(frame_id);                       // 3
+    locale_new_[frame_id] = std::prev(frames_new_.end());  // 4
 
-    evictable_[frame_id] = true;
+    evictable_[frame_id] = true;  // 2
     curr_size_++;
   }
 

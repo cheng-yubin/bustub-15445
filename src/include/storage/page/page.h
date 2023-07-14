@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "common/config.h"
+#include "common/logger.h"
 #include "common/rwlatch.h"
 
 namespace bustub {
@@ -49,16 +50,28 @@ class Page {
   inline auto IsDirty() -> bool { return is_dirty_; }
 
   /** Acquire the page write latch. */
-  inline void WLatch() { rwlatch_.WLock(); }
+  inline void WLatch() {
+    LOG_DEBUG("wlatch %d", page_id_);
+    rwlatch_.WLock();
+  }
 
   /** Release the page write latch. */
-  inline void WUnlatch() { rwlatch_.WUnlock(); }
+  inline void WUnlatch() {
+    LOG_DEBUG("wunlatch %d", page_id_);
+    rwlatch_.WUnlock();
+  }
 
   /** Acquire the page read latch. */
-  inline void RLatch() { rwlatch_.RLock(); }
+  inline void RLatch() {
+    LOG_DEBUG("rlatch %d", page_id_);
+    rwlatch_.RLock();
+  }
 
   /** Release the page read latch. */
-  inline void RUnlatch() { rwlatch_.RUnlock(); }
+  inline void RUnlatch() {
+    LOG_DEBUG("runlatch %d", page_id_);
+    rwlatch_.RUnlock();
+  }
 
   /** @return the page LSN. */
   inline auto GetLSN() -> lsn_t { return *reinterpret_cast<lsn_t *>(GetData() + OFFSET_LSN); }

@@ -1,0 +1,143 @@
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:19:BPlusTree] DEBUG - leaf_max_size: 3
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:20:BPlusTree] DEBUG - internal_max_size: 5
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 1
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:259:CreateTree] DEBUG - Tree is empty, create a tree
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:313:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 2
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:313:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 3
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:340:Insert] DEBUG - leaf page is full, start to split.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:390:SplitPage] DEBUG - create new root page
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/page/b_plus_tree_internal_page.cpp:29:Init] DEBUG - leaf page init
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:342:Insert] DEBUG - split end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:351:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 4
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:340:Insert] DEBUG - leaf page is full, start to split.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:422:SplitPage] DEBUG - parent page is not full
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:342:Insert] DEBUG - split end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:351:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 5
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:340:Insert] DEBUG - leaf page is full, start to split.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:422:SplitPage] DEBUG - parent page is not full
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:342:Insert] DEBUG - split end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:351:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 6
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:340:Insert] DEBUG - leaf page is full, start to split.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:422:SplitPage] DEBUG - parent page is not full
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:342:Insert] DEBUG - split end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:351:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 7
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:340:Insert] DEBUG - leaf page is full, start to split.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:439:SplitPage] DEBUG - parent page is full
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/page/b_plus_tree_internal_page.cpp:29:Init] DEBUG - leaf page init
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:390:SplitPage] DEBUG - create new root page
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/page/b_plus_tree_internal_page.cpp:29:Init] DEBUG - leaf page init
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:342:Insert] DEBUG - split end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:351:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 8
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:340:Insert] DEBUG - leaf page is full, start to split.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:422:SplitPage] DEBUG - parent page is not full
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:342:Insert] DEBUG - split end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:351:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 9
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:340:Insert] DEBUG - leaf page is full, start to split.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:422:SplitPage] DEBUG - parent page is not full
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:342:Insert] DEBUG - split end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:351:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:287:Insert] DEBUG - insert start. key = 10
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:298:Insert] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:340:Insert] DEBUG - leaf page is full, start to split.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:439:SplitPage] DEBUG - parent page is full
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/page/b_plus_tree_internal_page.cpp:29:Init] DEBUG - leaf page init
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:422:SplitPage] DEBUG - parent page is not full
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:342:Insert] DEBUG - split end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:351:Insert] DEBUG - insert end. 
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:501:Remove] DEBUG - remove start. key = 4
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:501:Remove] DEBUG - remove start. key = 1
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:511:Remove] DEBUG - 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:511:Remove] DEBUG - GetLeafPageOptimistic start.
+40: GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:513:Remove] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:513:Remove] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:564:Remove] DEBUG - Need to Redistribution.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:608:RedistributePage] DEBUG - start to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:837:Merge] DEBUG - merge with right sibling. 2
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:639:RedistributePage] DEBUG - need to continue to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:608:RedistributePage] DEBUG - start to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:837:Merge] DEBUG - merge with right sibling. 8
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:639:RedistributePage] DEBUG - need to continue to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:589:RedistributePage] DEBUG - parent is root page.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:566:Remove] DEBUG - redistribution end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:576:Remove] DEBUG - remove end.
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:501:Remove] DEBUG - remove start. key = 3
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:511:Remove] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:568:Remove] DEBUG - No need to Redistribution.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:513:Remove] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:576:Remove] DEBUG - remove end.
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:501:Remove] DEBUG - remove start. key = 2
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:564:Remove] DEBUG - Need to Redistribution.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:511:Remove] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:608:RedistributePage] DEBUG - start to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:821:Merge] DEBUG - merge with left sibling, id = 1
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:566:Remove] DEBUG - redistribution end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:576:Remove] DEBUG - remove end.
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:501:Remove] DEBUG - remove start. key = 5
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:511:Remove] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:513:Remove] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:564:Remove] DEBUG - Need to Redistribution.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:513:Remove] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:608:RedistributePage] DEBUG - start to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:837:Merge] DEBUG - merge with right sibling. 6
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:566:Remove] DEBUG - redistribution end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:576:Remove] DEBUG - remove end.
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:568:Remove] DEBUG - No need to Redistribution.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:501:Remove] DEBUG - remove start. key = 6
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:576:Remove] DEBUG - remove end.
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:511:Remove] DEBUG - GetLeafPageOptimistic start.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:513:Remove] DEBUG - GetLeafPageOptimistic end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:564:Remove] DEBUG - Need to Redistribution.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:608:RedistributePage] DEBUG - start to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:821:Merge] DEBUG - merge with left sibling, id = 5
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:639:RedistributePage] DEBUG - need to continue to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:608:RedistributePage] DEBUG - start to merge.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:837:Merge] DEBUG - merge with right sibling. 13
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:616:RedistributePage] DEBUG - need to lower the tree.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:566:Remove] DEBUG - redistribution end.
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:576:Remove] DEBUG - remove end.
+40: 
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:1013:End] DEBUG - tree.end
+40: 2023-07-14 19:05:59 [autograder/source/bustub/src/storage/index/b_plus_tree.cpp:1045:End] DEBUG - tree.end page_id = 12, index = 2
+40: /autograder/source/bustub/test/storage/grading_b_plus_tree_checkpoint_2_concurrent_test.cpp:313: Failure

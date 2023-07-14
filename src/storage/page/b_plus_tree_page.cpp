@@ -31,7 +31,7 @@ void BPlusTreePage::IncreaseSize(int amount) { size_ += amount; }
 
 auto BPlusTreePage::IsFull() const -> bool { return size_ >= max_size_; }
 
-auto BPlusTreePage::Downflow() const -> bool { return size_ < max_size_ / 2; }
+auto BPlusTreePage::Downflow() const -> bool { return size_ < GetMinSize(); }
 
 /*
  * Helper methods to get/set max size (capacity) of the page

@@ -39,23 +39,43 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id
  * array offset)
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::KeyAt(int index) const -> KeyType { return array_[index].first; }
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::KeyAt(int index) const -> KeyType {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  return array_[index].first;
+}
 
 INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyAt(int index, const KeyType &key) { array_[index].first = key; }
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyAt(int index, const KeyType &key) {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  array_[index].first = key;
+}
 
 /*
  * Helper method to get the value associated with input "index"(a.k.a array
  * offset)
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType { return array_[index].second; }
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  return array_[index].second;
+}
 
 INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetValueAt(int index, const ValueType &value) { array_[index].second = value; }
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetValueAt(int index, const ValueType &value) {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  array_[index].second = value;
+}
 
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ItemAt(int index) -> MappingType & { return array_[index]; }
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ItemAt(int index) -> MappingType & {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  return array_[index];
+}
 
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetValue(const KeyType &key, const KeyComparator &comparator) const -> ValueType {
@@ -88,7 +108,7 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(const KeyType &key, const ValueTyp
   }
 
   for (int index = GetSize() - 1; index >= 1; index--) {
-    LOG_DEBUG("index = %d \n", index);
+    // LOG_DEBUG("index = %d \n", index);
 
     if (comparator(key, KeyAt(index)) < 0) {
       array_[index + 1] = array_[index];
@@ -100,7 +120,7 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(const KeyType &key, const ValueTyp
     }
   }
 
-  LOG_DEBUG("Insert to array[0]");
+  // LOG_DEBUG("Insert to array[0]");
   array_[1].first = key;
   array_[1].second = value;
   IncreaseSize(1);
@@ -117,16 +137,16 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetSibling(const ValueType &value, ValueTyp
     }
   }
 
+  BUSTUB_ASSERT(index != GetSize(), "NOT FOUND");
+
   left_sibling = index > 0 ? ValueAt(index - 1) : INVALID_PAGE_ID;
   right_sibling = index < (GetSize() - 1) ? ValueAt(index + 1) : INVALID_PAGE_ID;
 }
 
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::RemoveKV(const int index) -> bool {
-  if (index >= GetSize()) {
-    LOG_DEBUG("index overflow.");
-    return false;
-  }
+  BUSTUB_ASSERT(index >= 0, "index downflow.");
+  BUSTUB_ASSERT(index < GetSize(), "index upflow.");
 
   for (int i = index; i < GetSize() - 1; i++) {
     array_[i] = array_[i + 1];
