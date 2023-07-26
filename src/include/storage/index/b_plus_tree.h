@@ -13,6 +13,7 @@
 #include <mutex>  // NOLINT
 #include <queue>
 #include <string>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -77,15 +78,15 @@ class BPlusTree {
   void SplitPage(page_id_t page_id);
 
   // 节点重分布
-  void RedistributePage(page_id_t page_id);
+  void RedistributePage(page_id_t page_id, WlatchVector &pages_wlatch);
 
   // 从兄弟节点借KV
-  auto BorrowFromSibling(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr) -> bool;
+  auto BorrowFromSibling(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr, WlatchVector &pages_wlatch) -> bool;
 
   // 合并节点
-  void Merge(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr);
+  void Merge(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr, WlatchVector &pages_wlatch);
   void MergePage(BPlusTreePage *left_page_ptr, BPlusTreePage *right_page_ptr, InternalPage *parent_page_ptr,
-                 bool need_latch);
+                 WlatchVector &pages_wlatch);
 
   // return the page id of the root node
   auto GetRootPageId() -> page_id_t;

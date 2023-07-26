@@ -31,12 +31,13 @@ INDEXITERATOR_TYPE::IndexIterator(BufferPoolManager *buffer_pool_manager, page_i
   if (page_id_ != INVALID_PAGE_ID && buffer_pool_manager_ != nullptr) {
     // LOG_DEBUG("FetchPage");
     auto ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
-    if (ptr->IsLeafPage()) {
-      // LOG_DEBUG("asign page_ptr_");
-      page_ptr_ = static_cast<LeafPage *>(ptr);
-    } else {
-      buffer_pool_manager->UnpinPage(ptr->GetPageId(), false);
-    }
+    BUSTUB_ASSERT(ptr->IsLeafPage(), "NOT LEAF PAGE.");
+
+    page_ptr_ = static_cast<LeafPage *>(ptr);
+  } else {
+    page_id = INVALID_PAGE_ID;
+    buffer_pool_manager_ = nullptr;
+    index_ = 0;
   }
 }
 
@@ -48,6 +49,9 @@ INDEXITERATOR_TYPE::IndexIterator(const IndexIterator &itr) {
   index_ = itr.index_;
 
   if (!itr.page_ptr_) {
+    buffer_pool_manager_ = nullptr;
+    page_id_ = INVALID_PAGE_ID;
+    index_ = 0;
     page_ptr_ = nullptr;
   } else {
     page_ptr_ = reinterpret_cast<LeafPage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
@@ -56,14 +60,9 @@ INDEXITERATOR_TYPE::IndexIterator(const IndexIterator &itr) {
 
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::~IndexIterator() {
-  // LOG_DEBUG("deconstructor called.");
-  DebugInfo();
-  if (page_ptr_ != nullptr) {
-    // LOG_DEBUG("unpin.");operator
-    buffer_pool_manager_->FetchPage(page_id_)->GetData();
-    // buffer_pool_manager_->UnpinPage(INVALID_PAGE_ID, false);
-  } else {
-    // LOG_DEBUG("not unpin");
+  LOG_DEBUG("deconstructor called.");
+  if (!page_ptr_) {
+    buffer_pool_manager_->UnpinPage(page_id_, false);
   }
 }
 
@@ -131,19 +130,14 @@ auto INDEXITERATOR_TYPE::operator=(const IndexIterator &itr) {
   page_id_ = itr.page_id_;
   index_ = itr.index_;
 
-  if (itr.page_ptr_ != nullptr) {
+  if (!itr.page_ptr_) {
     page_ptr_ = nullptr;
+    page_id_ = INVALID_PAGE_ID;
+    index_ = 0;
+    buffer_pool_manager_ = nullptr;
   } else {
     page_ptr_ = reinterpret_cast<LeafPage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
   }
-}
-
-INDEX_TEMPLATE_ARGUMENTS
-void INDEXITERATOR_TYPE::DebugInfo() const {
-  // LOG_DEBUG("page_id = %d", page_id_);
-  // LOG_DEBUG("index = %d", index_);
-  // LOG_DEBUG("ptr is null? %d", page_ptr_==nullptr);
-  // LOG_DEBUG("buffer_ptr is null? %d", buffer_pool_manager_==nullptr);
 }
 
 template class IndexIterator<GenericKey<4>, RID, GenericComparator<4>>;

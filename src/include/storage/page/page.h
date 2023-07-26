@@ -51,27 +51,40 @@ class Page {
 
   /** Acquire the page write latch. */
   inline void WLatch() {
-    LOG_DEBUG("wlatch %d", page_id_);
+    // LOG_DEBUG("wlatch %d", page_id_);
     rwlatch_.WLock();
+    // wlatch_couut++;
   }
 
   /** Release the page write latch. */
   inline void WUnlatch() {
-    LOG_DEBUG("wunlatch %d", page_id_);
+    // LOG_DEBUG("wunlatch %d", page_id_);
     rwlatch_.WUnlock();
+    // wlatch_couut--;
   }
 
   /** Acquire the page read latch. */
   inline void RLatch() {
-    LOG_DEBUG("rlatch %d", page_id_);
+    // LOG_DEBUG("rlatch %d", page_id_);
     rwlatch_.RLock();
+    // rlatch_count++;
   }
 
   /** Release the page read latch. */
   inline void RUnlatch() {
-    LOG_DEBUG("runlatch %d", page_id_);
+    // LOG_DEBUG("runlatch %d", page_id_);
     rwlatch_.RUnlock();
+    // rlatch_count--;
   }
+
+  // inline void Check() {
+  //   if (rlatch_count != 0 || wlatch_couut != 0) {
+  //     LOG_DEBUG("error!");
+  //     LOG_DEBUG("rlatch = %d, wlatch = %d", rlatch_count, wlatch_couut);
+  //   } else {
+  //     LOG_DEBUG("latch balanced");
+  //   }
+  // }
 
   /** @return the page LSN. */
   inline auto GetLSN() -> lsn_t { return *reinterpret_cast<lsn_t *>(GetData() + OFFSET_LSN); }
@@ -101,6 +114,8 @@ class Page {
   bool is_dirty_ = false;
   /** Page latch. */
   ReaderWriterLatch rwlatch_;
-};
 
+  // static int wlatch_couut;
+  // static int rlatch_count;
+};
 }  // namespace bustub

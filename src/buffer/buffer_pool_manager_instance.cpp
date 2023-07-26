@@ -18,6 +18,9 @@
 
 namespace bustub {
 
+// int Page::wlatch_couut = 0;
+// int Page::rlatch_count = 0;
+
 BufferPoolManagerInstance::BufferPoolManagerInstance(size_t pool_size, DiskManager *disk_manager, size_t replacer_k,
                                                      LogManager *log_manager)
     : pool_size_(pool_size), disk_manager_(disk_manager), log_manager_(log_manager) {

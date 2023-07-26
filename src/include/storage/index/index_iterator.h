@@ -47,6 +47,8 @@ class IndexIterator {
 
   void DebugInfo() const;
 
+  inline auto GetID() -> page_id_t { return page_id_; }
+
  private:
   BufferPoolManager *buffer_pool_manager_;
   page_id_t page_id_;

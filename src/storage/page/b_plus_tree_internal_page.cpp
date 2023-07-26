@@ -26,7 +26,7 @@ namespace bustub {
  */
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size) {
-  LOG_DEBUG("leaf page init");
+  // LOG_DEBUG("internal page init");
   SetPageType(IndexPageType::INTERNAL_PAGE);
   SetLSN(INVALID_LSN);
   SetSize(0);
@@ -120,7 +120,7 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(const KeyType &key, const ValueTyp
     }
   }
 
-  // LOG_DEBUG("Insert to array[0]");
+  // LOG_DEBUG("Insert to array[1]");
   array_[1].first = key;
   array_[1].second = value;
   IncreaseSize(1);
@@ -141,6 +141,17 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetSibling(const ValueType &value, ValueTyp
 
   left_sibling = index > 0 ? ValueAt(index - 1) : INVALID_PAGE_ID;
   right_sibling = index < (GetSize() - 1) ? ValueAt(index + 1) : INVALID_PAGE_ID;
+
+  int64_t key = KeyAt(index).ToString();
+  int64_t key_left = index > 0 ? KeyAt(index - 1).ToString() : static_cast<int64_t>(0);
+  int64_t key_right = index < (GetSize() - 1) ? KeyAt(index + 1).ToString() : static_cast<int64_t>(0);
+
+  LOG_DEBUG("index = %d, size = %d, id = %d, left_id = %d, right_id = %d", index, GetSize(), value, left_sibling,
+            right_sibling);
+  LOG_DEBUG("key = %ld, left_key = %ld, right_key = %ld", key, key_left, key_right);
+
+  BUSTUB_ASSERT(value != left_sibling, "equal to left");
+  BUSTUB_ASSERT(value != right_sibling, "equal to right");
 }
 
 INDEX_TEMPLATE_ARGUMENTS
