@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/cyb/cmu15445/bustub-15445/third_party/utf8proc/utf8proc.c
+utf8proc.h
+/home/cyb/cmu15445/bustub-15445/third_party/utf8proc/utf8proc.h
+utf8proc_data.c
+/home/cyb/cmu15445/bustub-15445/third_party/utf8proc/utf8proc_data.c
+
+/home/cyb/cmu15445/bustub-15445/third_party/utf8proc/utf8proc.h
+stdlib.h
+-
+stddef.h
+-
+stdbool.h
+-
+inttypes.h
+-
+limits.h
+-
+
+/home/cyb/cmu15445/bustub-15445/third_party/utf8proc/utf8proc_data.c
+

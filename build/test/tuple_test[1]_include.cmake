@@ -1,0 +1,5 @@
+if(EXISTS "/home/cyb/cmu15445/bustub-15445/build/test/tuple_test[1]_tests.cmake")
+  include("/home/cyb/cmu15445/bustub-15445/build/test/tuple_test[1]_tests.cmake")
+else()
+  add_test(tuple_test_NOT_BUILT tuple_test_NOT_BUILT)
+endif()
