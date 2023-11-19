@@ -14,6 +14,7 @@ namespace bustub {
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::IndexIterator() {
   // LOG_DEBUG("default constructor called.");
+
   buffer_pool_manager_ = nullptr;
   page_id_ = INVALID_PAGE_ID;
   index_ = 0;
@@ -23,53 +24,55 @@ INDEXITERATOR_TYPE::IndexIterator() {
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::IndexIterator(BufferPoolManager *buffer_pool_manager, page_id_t page_id, int index) {
   // LOG_DEBUG("constructor called.");
-  buffer_pool_manager_ = buffer_pool_manager;
-  page_id_ = page_id;
-  index_ = index;
-  page_ptr_ = nullptr;
 
   if (page_id_ != INVALID_PAGE_ID && buffer_pool_manager_ != nullptr) {
-    // LOG_DEBUG("FetchPage");
+    buffer_pool_manager_ = buffer_pool_manager;
+    page_id_ = page_id;
+    index_ = index;
+    
+    LOG_DEBUG("FetchPage");
     auto ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
     BUSTUB_ASSERT(ptr->IsLeafPage(), "NOT LEAF PAGE.");
-
     page_ptr_ = static_cast<LeafPage *>(ptr);
+
   } else {
     page_id = INVALID_PAGE_ID;
     buffer_pool_manager_ = nullptr;
     index_ = 0;
+    page_ptr_ = nullptr;
   }
 }
 
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::IndexIterator(const IndexIterator &itr) {
   // LOG_DEBUG("copy constructor operatorcalled.");
-  buffer_pool_manager_ = itr.buffer_pool_manager_;
-  page_id_ = itr.page_id_;
-  index_ = itr.index_;
 
   if (!itr.page_ptr_) {
     buffer_pool_manager_ = nullptr;
     page_id_ = INVALID_PAGE_ID;
     index_ = 0;
     page_ptr_ = nullptr;
+
   } else {
+    buffer_pool_manager_ = itr.buffer_pool_manager_;
+    page_id_ = itr.page_id_;
+    index_ = itr.index_;
     page_ptr_ = reinterpret_cast<LeafPage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
   }
 }
 
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::~IndexIterator() {
-  LOG_DEBUG("deconstructor called.");
-  if (!page_ptr_) {
+  // LOG_DEBUG("deconstructor called.");
+
+  if (page_ptr_) {
     buffer_pool_manager_->UnpinPage(page_id_, false);
   }
 }
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::IsEnd() -> bool {
-  BUSTUB_ASSERT(page_ptr_ != nullptr, "page_ptr_ is nullptr.");
-  return (page_ptr_->GetNextPageId() == INVALID_PAGE_ID) && (index_ == page_ptr_->GetSize());
+  return page_ptr_ == nullptr;
 }
 
 INDEX_TEMPLATE_ARGUMENTS
@@ -90,14 +93,15 @@ auto INDEXITERATOR_TYPE::operator++() -> INDEXITERATOR_TYPE & {
 
   page_id_t next_page_id = page_ptr_->GetNextPageId();
 
-  // 超尾
+  // return end
   if (next_page_id == INVALID_PAGE_ID) {
-    index_++;
+    page_id_ = INVALID_PAGE_ID;
+    page_ptr_ = nullptr;
+    index_ = 0;
     return *this;
   }
 
   buffer_pool_manager_->UnpinPage(page_id_, false);
-
   page_id_ = next_page_id;
   page_ptr_ = reinterpret_cast<LeafPage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
   index_ = 0;
@@ -108,27 +112,26 @@ auto INDEXITERATOR_TYPE::operator++() -> INDEXITERATOR_TYPE & {
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator==(const IndexIterator &itr) const -> bool {
   // LOG_DEBUG("operator== called.");
-  BUSTUB_ASSERT(page_ptr_ != nullptr, "page_ptr_ is nullptr.");
-  BUSTUB_ASSERT(itr.page_ptr_ != nullptr, "itr.page_ptr_ is nullptr.");
+  if (!page_ptr_ && !itr.page_ptr_) {
+    return true;
+  }
 
-  return page_id_ == itr.page_id_ && index_ == itr.index_;
+  if (page_ptr_ && itr.page_ptr_) {
+    return page_id_ == itr.page_id_ && index_ == itr.index_;
+  }
+
+  return false;
 }
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator!=(const IndexIterator &itr) const -> bool {
   // LOG_DEBUG("operator!= called.");
-  BUSTUB_ASSERT(page_ptr_ != nullptr, "page_ptr_ is nullptr.");
-  BUSTUB_ASSERT(itr.page_ptr_ != nullptr, "itr.page_ptr_ is nullptr.");
-
-  return page_id_ != itr.page_id_ || index_ != itr.index_;
+  return !(*this == itr);
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-auto INDEXITERATOR_TYPE::operator=(const IndexIterator &itr) {
+void INDEXITERATOR_TYPE::operator=(const IndexIterator &itr){
   // LOG_DEBUG("operator= called.");
-  buffer_pool_manager_ = itr.buffer_pool_manager_;
-  page_id_ = itr.page_id_;
-  index_ = itr.index_;
 
   if (!itr.page_ptr_) {
     page_ptr_ = nullptr;
@@ -136,6 +139,9 @@ auto INDEXITERATOR_TYPE::operator=(const IndexIterator &itr) {
     index_ = 0;
     buffer_pool_manager_ = nullptr;
   } else {
+    buffer_pool_manager_ = itr.buffer_pool_manager_;
+    page_id_ = itr.page_id_;
+    index_ = itr.index_;
     page_ptr_ = reinterpret_cast<LeafPage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
   }
 }

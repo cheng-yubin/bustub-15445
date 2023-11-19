@@ -704,26 +704,6 @@ string
 stdint.h
 -
 
-/home/cyb/cmu15445/bustub-15445/tools/sqllogictest/parser.cpp
-iostream
--
-memory
--
-string
--
-string_view
--
-vector
--
-common/exception.h
-/home/cyb/cmu15445/bustub-15445/tools/sqllogictest/common/exception.h
-common/util/string_util.h
-/home/cyb/cmu15445/bustub-15445/tools/sqllogictest/common/util/string_util.h
-fmt/ranges.h
-/home/cyb/cmu15445/bustub-15445/tools/sqllogictest/fmt/ranges.h
-parser.h
-/home/cyb/cmu15445/bustub-15445/tools/sqllogictest/parser.h
-
 /home/cyb/cmu15445/bustub-15445/tools/sqllogictest/parser.h
 memory
 -

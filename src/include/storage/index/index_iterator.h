@@ -27,6 +27,7 @@ class IndexIterator {
   // you may define your own constructor based on your member variables
   IndexIterator();
   IndexIterator(BufferPoolManager *buffer_pool_manager, page_id_t page_id, int index);
+  
   // 复制构造，深拷贝
   IndexIterator(const IndexIterator &itr);
 
@@ -43,7 +44,7 @@ class IndexIterator {
   auto operator!=(const IndexIterator &itr) const -> bool;
 
   // 赋值运算, 深拷贝
-  auto operator=(const IndexIterator &itr);
+  void operator=(const IndexIterator &itr);
 
   void DebugInfo() const;
 

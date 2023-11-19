@@ -622,24 +622,6 @@ string
 stdint.h
 -
 
-/home/cyb/cmu15445/bustub-15445/src/catalog/column.cpp
-catalog/column.h
-/home/cyb/cmu15445/bustub-15445/src/catalog/catalog/column.h
-sstream
--
-string
--
-
-/home/cyb/cmu15445/bustub-15445/src/catalog/schema.cpp
-catalog/schema.h
-/home/cyb/cmu15445/bustub-15445/src/catalog/catalog/schema.h
-sstream
--
-string
--
-vector
--
-
 /home/cyb/cmu15445/bustub-15445/src/catalog/table_generator.cpp
 catalog/table_generator.h
 /home/cyb/cmu15445/bustub-15445/src/catalog/catalog/table_generator.h

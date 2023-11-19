@@ -602,16 +602,6 @@ string
 stdint.h
 -
 
-/home/cyb/cmu15445/bustub-15445/src/concurrency/lock_manager.cpp
-concurrency/lock_manager.h
-/home/cyb/cmu15445/bustub-15445/src/concurrency/concurrency/lock_manager.h
-common/config.h
-/home/cyb/cmu15445/bustub-15445/src/concurrency/common/config.h
-concurrency/transaction.h
-/home/cyb/cmu15445/bustub-15445/src/concurrency/concurrency/transaction.h
-concurrency/transaction_manager.h
-/home/cyb/cmu15445/bustub-15445/src/concurrency/concurrency/transaction_manager.h
-
 /home/cyb/cmu15445/bustub-15445/src/concurrency/transaction_manager.cpp
 concurrency/transaction_manager.h
 /home/cyb/cmu15445/bustub-15445/src/concurrency/concurrency/transaction_manager.h
