@@ -61,6 +61,8 @@ class InsertExecutor : public AbstractExecutor {
   std::unique_ptr<AbstractExecutor> child_executor_;
   // number of tuples inserted
   int32_t num_inserted{0};
+  // flag for output
+  bool output{false};
 };
 
 }  // namespace bustub
