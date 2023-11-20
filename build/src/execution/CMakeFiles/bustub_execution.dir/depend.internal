@@ -648,6 +648,7 @@ src/execution/CMakeFiles/bustub_execution.dir/nested_index_join_executor.cpp.o
  ../src/include/common/macros.h
  ../src/include/common/rid.h
  ../src/include/common/rwlatch.h
+ ../src/include/common/util/string_util.h
  ../src/include/concurrency/lock_manager.h
  ../src/include/concurrency/transaction.h
  ../src/include/container/disk/hash/disk_extendible_hash_table.h
@@ -681,10 +682,17 @@ src/execution/CMakeFiles/bustub_execution.dir/nested_index_join_executor.cpp.o
  ../src/include/storage/table/table_iterator.h
  ../src/include/storage/table/tmp_tuple.h
  ../src/include/storage/table/tuple.h
+ ../src/include/type/abstract_pool.h
+ ../src/include/type/boolean_type.h
+ ../src/include/type/decimal_type.h
  ../src/include/type/limits.h
+ ../src/include/type/numeric_type.h
+ ../src/include/type/timestamp_type.h
  ../src/include/type/type.h
  ../src/include/type/type_id.h
  ../src/include/type/value.h
+ ../src/include/type/value_factory.h
+ ../src/include/type/varlen_type.h
  ../third_party/fmt/include/fmt/core.h
  ../third_party/fmt/include/fmt/format-inl.h
  ../third_party/fmt/include/fmt/format.h
@@ -706,6 +714,7 @@ src/execution/CMakeFiles/bustub_execution.dir/nested_loop_join_executor.cpp.o
  ../src/include/common/macros.h
  ../src/include/common/rid.h
  ../src/include/common/rwlatch.h
+ ../src/include/common/util/string_util.h
  ../src/include/concurrency/lock_manager.h
  ../src/include/concurrency/transaction.h
  ../src/include/container/disk/hash/disk_extendible_hash_table.h
@@ -739,10 +748,17 @@ src/execution/CMakeFiles/bustub_execution.dir/nested_loop_join_executor.cpp.o
  ../src/include/storage/table/table_iterator.h
  ../src/include/storage/table/tmp_tuple.h
  ../src/include/storage/table/tuple.h
+ ../src/include/type/abstract_pool.h
+ ../src/include/type/boolean_type.h
+ ../src/include/type/decimal_type.h
  ../src/include/type/limits.h
+ ../src/include/type/numeric_type.h
+ ../src/include/type/timestamp_type.h
  ../src/include/type/type.h
  ../src/include/type/type_id.h
  ../src/include/type/value.h
+ ../src/include/type/value_factory.h
+ ../src/include/type/varlen_type.h
  ../third_party/fmt/include/fmt/core.h
  ../third_party/fmt/include/fmt/format-inl.h
  ../third_party/fmt/include/fmt/format.h
