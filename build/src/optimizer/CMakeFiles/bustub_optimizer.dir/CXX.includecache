@@ -1189,6 +1189,12 @@ type/type_id.h
 /home/cyb/cmu15445/bustub-15445/src/optimizer/type/type_id.h
 
 /home/cyb/cmu15445/bustub-15445/src/optimizer/sort_limit_as_topn.cpp
+execution/plans/limit_plan.h
+/home/cyb/cmu15445/bustub-15445/src/optimizer/execution/plans/limit_plan.h
+execution/plans/sort_plan.h
+/home/cyb/cmu15445/bustub-15445/src/optimizer/execution/plans/sort_plan.h
+execution/plans/topn_plan.h
+/home/cyb/cmu15445/bustub-15445/src/optimizer/execution/plans/topn_plan.h
 optimizer/optimizer.h
 /home/cyb/cmu15445/bustub-15445/src/optimizer/optimizer/optimizer.h
 

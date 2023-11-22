@@ -13,6 +13,8 @@
 #pragma once
 
 #include <memory>
+#include <queue>
+#include <utility>
 #include <vector>
 
 #include "execution/executor_context.h"
@@ -22,6 +24,17 @@
 #include "storage/table/tuple.h"
 
 namespace bustub {
+class TopNExecutorComparator {
+ public:
+  TopNExecutorComparator(const TopNPlanNode *plan, const Schema *scheme) : plan_(plan), scheme_(scheme) {}
+
+  // true when
+  auto operator()(const std::pair<RID, Tuple> &entity1, const std::pair<RID, Tuple> &entity2) -> bool;
+
+ private:
+  const TopNPlanNode *plan_;
+  const Schema *scheme_;
+};
 
 /**
  * The TopNExecutor executor executes a topn.
@@ -52,5 +65,14 @@ class TopNExecutor : public AbstractExecutor {
  private:
   /** The topn plan node to be executed */
   const TopNPlanNode *plan_;
+  std::unique_ptr<AbstractExecutor> child_executor_;
+
+  size_t heap_size_{0};
+
+  std::priority_queue<std::pair<RID, Tuple>, std::vector<std::pair<RID, Tuple>>, TopNExecutorComparator> heap_;
+
+  int output_count_{0};
+  std::vector<std::pair<RID, Tuple>> res_;
 };
+
 }  // namespace bustub

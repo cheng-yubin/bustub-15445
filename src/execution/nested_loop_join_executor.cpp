@@ -20,13 +20,16 @@ namespace bustub {
 NestedLoopJoinExecutor::NestedLoopJoinExecutor(ExecutorContext *exec_ctx, const NestedLoopJoinPlanNode *plan,
                                                std::unique_ptr<AbstractExecutor> &&left_executor,
                                                std::unique_ptr<AbstractExecutor> &&right_executor)
-    : AbstractExecutor(exec_ctx), plan_(plan), left_executor_(std::move(left_executor)), right_executor_(std::move(right_executor)) {
+    : AbstractExecutor(exec_ctx),
+      plan_(plan),
+      left_executor_(std::move(left_executor)),
+      right_executor_(std::move(right_executor)) {
   if (!(plan->GetJoinType() == JoinType::LEFT || plan->GetJoinType() == JoinType::INNER)) {
     throw bustub::NotImplementedException(fmt::format("join type {} not supported", plan->GetJoinType()));
   }
 }
 
-void NestedLoopJoinExecutor::Init() { 
+void NestedLoopJoinExecutor::Init() {
   left_executor_->Init();
   right_executor_->Init();
 
@@ -35,16 +38,16 @@ void NestedLoopJoinExecutor::Init() {
   end_ = !left_status;
 
   left_ = false;
- }
+}
 
-auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool { 
+auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool {
   if (end_) {
     return false;
   }
-  
+
   // Inner join
   if (plan_->GetJoinType() == JoinType::INNER) {
-    auto& join_expr = plan_->Predicate();
+    auto &join_expr = plan_->Predicate();
 
     while (!end_) {
       const bool right_status = right_executor_->Next(&right_tuple_, rid);
@@ -56,8 +59,8 @@ auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool {
         continue;
       }
 
-      auto value = join_expr.EvaluateJoin(&left_tuple_, left_executor_->GetOutputSchema(), 
-                                          &right_tuple_, right_executor_->GetOutputSchema());
+      auto value = join_expr.EvaluateJoin(&left_tuple_, left_executor_->GetOutputSchema(), &right_tuple_,
+                                          right_executor_->GetOutputSchema());
       if (!value.IsNull() && value.GetAs<bool>()) {
         std::vector<Value> vec;
         for (uint32_t i = 0; i < left_executor_->GetOutputSchema().GetColumnCount(); ++i) {
@@ -70,13 +73,12 @@ auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool {
         return true;
       }
     }
-    
+
     return false;
   }
 
-  // Left join
-  else if (plan_->GetJoinType() == JoinType::LEFT) {
-    auto& join_expr = plan_->Predicate();
+  if (plan_->GetJoinType() == JoinType::LEFT) {
+    auto &join_expr = plan_->Predicate();
 
     while (!end_) {
       const bool right_status = right_executor_->Next(&right_tuple_, rid);
@@ -105,8 +107,8 @@ auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool {
         continue;
       }
 
-      auto value = join_expr.EvaluateJoin(&left_tuple_, left_executor_->GetOutputSchema(), 
-                                          &right_tuple_, right_executor_->GetOutputSchema());
+      auto value = join_expr.EvaluateJoin(&left_tuple_, left_executor_->GetOutputSchema(), &right_tuple_,
+                                          right_executor_->GetOutputSchema());
       if (!value.IsNull() && value.GetAs<bool>()) {
         std::vector<Value> vec;
         for (uint32_t i = 0; i < left_executor_->GetOutputSchema().GetColumnCount(); ++i) {
@@ -123,8 +125,7 @@ auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool {
     return false;
   }
 
-  
   return false;
- }
+}
 
 }  // namespace bustub

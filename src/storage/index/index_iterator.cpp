@@ -29,7 +29,7 @@ INDEXITERATOR_TYPE::IndexIterator(BufferPoolManager *buffer_pool_manager, page_i
     buffer_pool_manager_ = buffer_pool_manager;
     page_id_ = page_id;
     index_ = index;
-    
+
     LOG_DEBUG("FetchPage");
     auto ptr = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(page_id_)->GetData());
     BUSTUB_ASSERT(ptr->IsLeafPage(), "NOT LEAF PAGE.");
@@ -71,9 +71,7 @@ INDEXITERATOR_TYPE::~IndexIterator() {
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-auto INDEXITERATOR_TYPE::IsEnd() -> bool {
-  return page_ptr_ == nullptr;
-}
+auto INDEXITERATOR_TYPE::IsEnd() -> bool { return page_ptr_ == nullptr; }
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator*() -> const MappingType & {
@@ -130,7 +128,7 @@ auto INDEXITERATOR_TYPE::operator!=(const IndexIterator &itr) const -> bool {
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-void INDEXITERATOR_TYPE::operator=(const IndexIterator &itr){
+void INDEXITERATOR_TYPE::operator=(const IndexIterator &itr) {
   // LOG_DEBUG("operator= called.");
 
   if (!itr.page_ptr_) {

@@ -28,13 +28,7 @@ BPLUSTREE_TYPE::~BPlusTree() = default;
  * 判空，不需要加锁
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto BPLUSTREE_TYPE::IsEmpty() const -> bool {
-  if (root_page_id_ == INVALID_PAGE_ID) {
-    return true;
-  }
-
-  return false;
-}
+auto BPLUSTREE_TYPE::IsEmpty() const -> bool { return root_page_id_ == INVALID_PAGE_ID; }
 
 /*****************************************************************************
  * SEARCH

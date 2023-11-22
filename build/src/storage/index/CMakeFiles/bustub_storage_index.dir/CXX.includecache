@@ -150,12 +150,6 @@ storage/page/page.h
 storage/table/tuple.h
 ../src/include/concurrency/storage/table/tuple.h
 
-../src/include/container/hash/hash_function.h
-cstdint
--
-murmur3/MurmurHash3.h
-../src/include/container/hash/murmur3/MurmurHash3.h
-
 ../src/include/recovery/log_manager.h
 algorithm
 -
@@ -216,41 +210,9 @@ storage/page/b_plus_tree_internal_page.h
 storage/page/b_plus_tree_leaf_page.h
 ../src/include/storage/index/storage/page/b_plus_tree_leaf_page.h
 
-../src/include/storage/index/b_plus_tree_index.h
-map
--
-memory
--
-string
--
-vector
--
-container/hash/hash_function.h
-../src/include/storage/index/container/hash/hash_function.h
-storage/index/b_plus_tree.h
-../src/include/storage/index/storage/index/b_plus_tree.h
-storage/index/index.h
-../src/include/storage/index/storage/index/index.h
-
 ../src/include/storage/index/generic_key.h
 cstring
 -
-storage/table/tuple.h
-../src/include/storage/index/storage/table/tuple.h
-type/value.h
-../src/include/storage/index/type/value.h
-
-../src/include/storage/index/index.h
-memory
--
-string
--
-utility
--
-vector
--
-catalog/schema.h
-../src/include/storage/index/catalog/schema.h
 storage/table/tuple.h
 ../src/include/storage/index/storage/table/tuple.h
 type/value.h
@@ -434,12 +396,6 @@ fmt/format.h
 format-inl.h
 ../third_party/fmt/include/fmt/format-inl.h
 
-../third_party/murmur3/MurmurHash3.h
-string
--
-stdint.h
--
-
 /home/cyb/cmu15445/bustub-15445/src/storage/index/b_plus_tree.cpp
 string
 -
@@ -453,14 +409,4 @@ storage/index/b_plus_tree.h
 /home/cyb/cmu15445/bustub-15445/src/storage/index/storage/index/b_plus_tree.h
 storage/page/header_page.h
 /home/cyb/cmu15445/bustub-15445/src/storage/index/storage/page/header_page.h
-
-/home/cyb/cmu15445/bustub-15445/src/storage/index/b_plus_tree_index.cpp
-storage/index/b_plus_tree_index.h
-/home/cyb/cmu15445/bustub-15445/src/storage/index/storage/index/b_plus_tree_index.h
-
-/home/cyb/cmu15445/bustub-15445/src/storage/index/index_iterator.cpp
-cassert
--
-storage/index/index_iterator.h
-/home/cyb/cmu15445/bustub-15445/src/storage/index/storage/index/index_iterator.h
 

@@ -13,6 +13,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "execution/executor_context.h"
@@ -50,7 +51,6 @@ class SortExecutor : public AbstractExecutor {
   auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); }
 
  private:
-
   /** The sort plan node to be executed */
   const SortPlanNode *plan_;
 
@@ -64,19 +64,17 @@ class SortExecutor : public AbstractExecutor {
 };
 
 class SortExecutorComparator {
-  public:
-  void set(const SortPlanNode * plan, const Schema * scheme) {
+ public:
+  void Set(const SortPlanNode *plan, const Schema *scheme) {
     plan_ = plan;
     scheme_ = scheme;
   }
 
-  auto operator()(const std::pair<RID, Tuple>& entity1, const std::pair<RID, Tuple>& entity2) -> bool;
+  auto operator()(const std::pair<RID, Tuple> &entity1, const std::pair<RID, Tuple> &entity2) -> bool;
 
-  private:
-    const SortPlanNode *plan_;
-    const Schema * scheme_;
+ private:
+  const SortPlanNode *plan_;
+  const Schema *scheme_;
 };
 
-
 }  // namespace bustub
-

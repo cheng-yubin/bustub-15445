@@ -45,7 +45,7 @@ class IndexScanExecutor : public AbstractExecutor {
   /** The index scan plan node to be executed. */
   const IndexScanPlanNode *plan_;
 
-  TableInfo* table_info_{};
+  TableInfo *table_info_{};
   bustub::BPlusTreeIndexIteratorForOneIntegerColumn iter_{};
   bustub::BPlusTreeIndexIteratorForOneIntegerColumn end_{};
 };

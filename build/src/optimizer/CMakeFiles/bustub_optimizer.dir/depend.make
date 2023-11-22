@@ -529,6 +529,8 @@ src/optimizer/CMakeFiles/bustub_optimizer.dir/order_by_index_scan.cpp.o: ../thir
 src/optimizer/CMakeFiles/bustub_optimizer.dir/order_by_index_scan.cpp.o: ../third_party/murmur3/MurmurHash3.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/order_by_index_scan.cpp.o: ../src/optimizer/order_by_index_scan.cpp
 
+src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/binder/bound_expression.h
+src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/binder/bound_order_by.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/buffer/buffer_pool_manager.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/buffer/lru_replacer.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/buffer/replacer.h
@@ -547,6 +549,9 @@ src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/i
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/container/hash/hash_function.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/execution/expressions/abstract_expression.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/execution/plans/abstract_plan.h
+src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/execution/plans/limit_plan.h
+src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/execution/plans/sort_plan.h
+src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/execution/plans/topn_plan.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/optimizer/optimizer.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/recovery/log_manager.h
 src/optimizer/CMakeFiles/bustub_optimizer.dir/sort_limit_as_topn.cpp.o: ../src/include/recovery/log_record.h

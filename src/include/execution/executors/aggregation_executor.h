@@ -72,7 +72,6 @@ class SimpleAggregationHashTable {
    */
   void CombineAggregateValues(AggregateValue *result, const AggregateValue &input) {
     for (uint32_t i = 0; i < agg_exprs_.size(); i++) {
-      
       if (input.aggregates_[i].IsNull()) {
         continue;
       }
@@ -239,6 +238,6 @@ class AggregationExecutor : public AbstractExecutor {
   /** Simple aggregation hash table iterator */
   SimpleAggregationHashTable::Iterator aht_iterator_;
 
-  bool output{false};
+  bool output_{false};
 };
 }  // namespace bustub
