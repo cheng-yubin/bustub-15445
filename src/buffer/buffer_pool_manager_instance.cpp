@@ -18,9 +18,6 @@
 
 namespace bustub {
 
-// int Page::wlatch_couut = 0;
-// int Page::rlatch_count = 0;
-
 BufferPoolManagerInstance::BufferPoolManagerInstance(size_t pool_size, DiskManager *disk_manager, size_t replacer_k,
                                                      LogManager *log_manager)
     : pool_size_(pool_size), disk_manager_(disk_manager), log_manager_(log_manager) {
@@ -49,17 +46,18 @@ auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * {
     frame_id = free_list_.back();
     free_list_.pop_back();
   } else if (!replacer_->Evict(&frame_id)) {
-    BUSTUB_ASSERT(false, "NEW PAGE FAIL.");
     return nullptr;
   }
+
+  // LOG_DEBUG("new page from evict, frame id = %d", frame_id);
 
   replacer_->RecordAccess(frame_id);
   replacer_->SetEvictable(frame_id, false);
 
-  page_id_t page_index = AllocatePage();
+  // page_id_t page_index = AllocatePage();
+  *page_id = AllocatePage();
 
   Page *page_ptr = &pages_[frame_id];
-
   if (page_ptr->IsDirty()) {
     FlushPgImp(page_ptr->page_id_);
   }
@@ -67,14 +65,13 @@ auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * {
   if (page_ptr->page_id_ != INVALID_PAGE_ID) {
     page_table_->Remove(page_ptr->page_id_);
   }
-  page_table_->Insert(page_index, frame_id);
+  page_table_->Insert(*page_id, frame_id);
 
-  page_ptr->page_id_ = page_index;
+  page_ptr->page_id_ = *page_id;
   page_ptr->ResetMemory();
   page_ptr->pin_count_ = 1;
   page_ptr->is_dirty_ = false;
 
-  *page_id = page_index;
   return page_ptr;
 }
 
@@ -82,6 +79,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) -> Page * {
   std::scoped_lock<std::mutex> lock(latch_);
   // LOG_DEBUG("fetch page called, free page num: %d", static_cast<int>(free_list_.size() + replacer_->Size()));
 
+  // the page has already been cached.
   frame_id_t frame_id;
   if (page_table_->Find(page_id, frame_id)) {
     replacer_->RecordAccess(frame_id);
@@ -91,11 +89,11 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) -> Page * {
     return &pages_[frame_id];
   }
 
+  // cache the page
   if (!free_list_.empty()) {
     frame_id = free_list_.back();
     free_list_.pop_back();
   } else if (!replacer_->Evict(&frame_id)) {
-    BUSTUB_ASSERT(false, "FETCH PAGE FAIL.");
     return nullptr;
   }
 
@@ -171,6 +169,7 @@ auto BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) -> bool {
   if (!page_table_->Find(page_id, frame_id)) {
     return true;
   }
+
   if (pages_[frame_id].GetPinCount() > 0) {
     return false;
   }
