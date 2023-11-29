@@ -27,6 +27,24 @@
 
 namespace bustub {
 
+class FrameStatus {
+ public:
+  explicit FrameStatus(size_t k);
+  void AddRecord(size_t curr_timestamp);
+  auto GetTimeStamp() -> size_t;
+  void Reset();
+  auto GetAccessCount() -> size_t;
+  auto Evictable() -> bool;
+  void SetEvictable(bool evictable);
+
+ private:
+  const size_t k_;
+  size_t access_cnt_;
+  bool evictable_;
+  std::vector<size_t> hist_;
+  int32_t curr_;
+};
+
 /**
  * LRUKReplacer implements the LRU-k replacement policy.
  *
@@ -159,9 +177,9 @@ class LRUKReplacer {
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
 
-  std::unordered_map<frame_id_t, size_t> access_cnt_;
-  std::unordered_map<frame_id_t, std::list<size_t>> access_hist_;
-  std::unordered_map<frame_id_t, bool> evictable_;
+  // std::unordered_map<frame_id_t, size_t> access_cnt_;
+  // std::unordered_map<frame_id_t, std::list<size_t>> access_hist_;
+  // std::unordered_map<frame_id_t, bool> evictable_;
 
   using k_time = std::pair<frame_id_t, size_t>;
 
@@ -178,6 +196,8 @@ class LRUKReplacer {
   std::mutex latch_;
 
   size_t curr_timestamp_{0};
+
+  std::vector<FrameStatus> frame_info_;
 
   static auto CmpTimeStamp(const k_time &t1, const k_time &t2) -> bool;
 };
