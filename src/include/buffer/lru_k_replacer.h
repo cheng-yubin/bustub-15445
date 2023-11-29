@@ -18,6 +18,7 @@
 #include <list>
 #include <memory>
 #include <mutex>  // NOLINT
+#include <optional>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -28,6 +29,8 @@
 namespace bustub {
 
 class FrameStatus {
+  using k_time = std::pair<frame_id_t, size_t>;
+
  public:
   explicit FrameStatus(size_t k);
   void AddRecord(size_t curr_timestamp);
@@ -37,12 +40,21 @@ class FrameStatus {
   auto Evictable() -> bool;
   void SetEvictable(bool evictable);
 
+  auto GetVisitIter() -> std::optional<std::list<frame_id_t>::iterator>;
+  void SetVisitIter(std::optional<std::list<frame_id_t>::iterator> iter_op);
+
+  auto GetCacheIter() -> std::optional<std::list<k_time>::iterator>;
+  void SetCacheIter(std::optional<std::list<k_time>::iterator> iter_op);
+
  private:
   const size_t k_;
   size_t access_cnt_;
   bool evictable_;
   std::vector<size_t> hist_;
   int32_t curr_;
+
+  std::optional<std::list<frame_id_t>::iterator> iter_visit_op_;
+  std::optional<std::list<k_time>::iterator> iter_cache_op_;
 };
 
 /**
@@ -182,22 +194,16 @@ class LRUKReplacer {
   // std::unordered_map<frame_id_t, bool> evictable_;
 
   using k_time = std::pair<frame_id_t, size_t>;
-
   std::list<frame_id_t> frames_new_;
-  std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> locale_new_;
-
   std::list<k_time> frames_k_;
-  std::unordered_map<frame_id_t, std::list<k_time>::iterator> locale_k_;
 
   size_t curr_size_{0};   // the number of evictable frames.
   size_t replacer_size_;  // the maximum number of the frames allowed.
   size_t k_;
-
-  std::mutex latch_;
-
   size_t curr_timestamp_{0};
 
   std::vector<FrameStatus> frame_info_;
+  std::mutex latch_;
 
   static auto CmpTimeStamp(const k_time &t1, const k_time &t2) -> bool;
 };
