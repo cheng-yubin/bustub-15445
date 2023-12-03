@@ -160,4 +160,29 @@ TEST(BufferPoolManagerInstanceTest, SampleTest) {
   delete disk_manager;
 }
 
+// NOLINTNEXTLINE
+TEST(BufferPoolManagerInstanceTest, PerformanceTest) {
+  const std::string db_name = "test.db";
+  const size_t buffer_pool_size = 10;
+  const size_t k = 5;
+
+  auto *disk_manager = new DiskManager(db_name);
+  auto *bpm = new BufferPoolManagerInstance(buffer_pool_size, disk_manager, k);
+
+  for (int r = 0; r < 10000; r++) {
+    std::vector<page_id_t> pages(buffer_pool_size);
+    for (int i = 0; i < 10; i++) {
+      bpm->NewPage(&pages[i]);
+      bpm->UnpinPage(pages[i], false);
+    }
+  }
+
+  // Shutdown the disk manager and remove the temporary file we created.
+  disk_manager->ShutDown();
+  remove("test.db");
+
+  delete bpm;
+  delete disk_manager;
+}
+
 }  // namespace bustub

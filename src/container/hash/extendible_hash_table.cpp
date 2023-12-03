@@ -108,6 +108,7 @@ void ExtendibleHashTable<K, V>::InsertInternal(const K &key, const V &value) {
       // expand the size of direction
       int dir_size = dir_.size();
       dir_.resize(dir_size * 2);
+
       for (int i = 0; i < dir_size; i++) {
         dir_[dir_size + i] = dir_[i];
       }
@@ -127,19 +128,37 @@ auto ExtendibleHashTable<K, V>::RedistributeBucket(const K &key) -> void {
   auto bucket_old = dir_[dir_index];
   bucket_old->IncrementDepth();
 
-  std::list<std::pair<K, V>> &items_new = bucket_new->GetItems();
-  std::list<std::pair<K, V>> &items_old = bucket_old->GetItems();
+  std::vector<std::pair<K, V>> &items_new = bucket_new->GetItems();
+  std::vector<std::pair<K, V>> &items_old = bucket_old->GetItems();
 
   size_t index_old = dir_index & ((1 << local_depth) - 1);
   size_t index_new = index_old + (1 << local_depth);
 
-  auto temp_iter = items_old.begin();
-  for (auto iter = items_old.begin(); iter != items_old.end();) {
-    temp_iter = iter++;
-    if ((std::hash<K>()(temp_iter->first) & ((1 << (local_depth + 1)) - 1)) == index_new) {
-      items_new.splice(items_new.end(), items_old, temp_iter);
+  size_t i = 0;
+  size_t &curr_size_old = bucket_old->GetCurrSize();
+  size_t &curr_size_new = bucket_new->GetCurrSize();
+
+  while (i < curr_size_old) {
+    if ((std::hash<K>()(items_old[i].first) & ((1 << (local_depth + 1)) - 1)) == index_new) {
+      items_new[curr_size_new].first = items_old[i].first;
+      items_new[curr_size_new].second = items_old[i].second;
+      ++curr_size_new;
+
+      items_old[i].first = items_old[curr_size_old - 1].first;
+      items_old[i].second = items_old[curr_size_old - 1].second;
+      --curr_size_old;
+    } else {
+      ++i;
     }
   }
+
+  // auto temp_iter = items_old.begin();
+  // for (auto iter = items_old.begin(); iter != items_old.end();) {
+  //   temp_iter = iter++;
+  //   if ((std::hash<K>()(temp_iter->first) & ((1 << (local_depth + 1)) - 1)) == index_new) {
+  //     items_new.splice(items_new.end(), items_old, temp_iter);
+  //   }
+  // }
 
   // redistribute the direction
   for (size_t index = 0; index < dir_.size(); index++) {
@@ -158,38 +177,55 @@ auto ExtendibleHashTable<K, V>::RedistributeBucket(const K &key) -> void {
 // Bucket
 //===--------------------------------------------------------------------===//
 template <typename K, typename V>
-ExtendibleHashTable<K, V>::Bucket::Bucket(size_t array_size, int depth) : size_(array_size), depth_(depth) {}
+ExtendibleHashTable<K, V>::Bucket::Bucket(size_t array_size, int depth)
+    : size_(array_size), depth_(depth), curr_size_(0), vec_(array_size) {}
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Find(const K &key, V &value) -> bool {
-  typename std::list<std::pair<K, V>>::iterator iter;
-  for (iter = list_.begin(); iter != list_.end(); iter++) {
-    if (iter->first == key) {
-      value = iter->second;
+  for (size_t i = 0; i < curr_size_; ++i) {
+    if (vec_[i].first == key) {
+      value = vec_[i].second;
       return true;
     }
   }
   return false;
+
+  // typename std::list<std::pair<K, V>>::iterator iter;
+  // for (iter = list_.begin(); iter != list_.end(); iter++) {
+  //   if (iter->first == key) {
+  //     value = iter->second;
+  //     return true;
+  //   }
+  // }
+  // return false;
 }
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Remove(const K &key) -> bool {
-  typename std::list<std::pair<K, V>>::iterator iter;
-  for (iter = list_.begin(); iter != list_.end(); iter++) {
-    if (iter->first == key) {
-      list_.erase(iter);
+  for (size_t i = 0; i < curr_size_; ++i) {
+    if (vec_[i].first == key) {
+      vec_[i] = vec_[curr_size_ - 1];
+      curr_size_--;
       return true;
     }
   }
   return false;
+
+  // typename std::list<std::pair<K, V>>::iterator iter;
+  // for (iter = list_.begin(); iter != list_.end(); iter++) {
+  //   if (iter->first == key) {
+  //     list_.erase(iter);
+  //     return true;
+  //   }
+  // }
+  // return false;
 }
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Insert(const K &key, const V &value) -> bool {
-  typename std::list<std::pair<K, V>>::iterator iter;
-  for (iter = list_.begin(); iter != list_.end(); iter++) {
-    if (iter->first == key) {
-      iter->second = value;
+  for (size_t i = 0; i < curr_size_; ++i) {
+    if (vec_[i].first == key) {
+      vec_[i].second = value;
       return true;
     }
   }
@@ -198,8 +234,25 @@ auto ExtendibleHashTable<K, V>::Bucket::Insert(const K &key, const V &value) -> 
     return false;
   }
 
-  list_.push_back(std::pair<K, V>(key, value));
+  vec_[curr_size_].first = key;
+  vec_[curr_size_].second = value;
+  ++curr_size_;
   return true;
+
+  // typename std::list<std::pair<K, V>>::iterator iter;
+  // for (iter = list_.begin(); iter != list_.end(); iter++) {
+  //   if (iter->first == key) {
+  //     iter->second = value;
+  //     return true;
+  //   }
+  // }
+
+  // if (IsFull()) {
+  //   return false;
+  // }
+
+  // list_.push_back(std::pair<K, V>(key, value));
+  // return true;
 }
 
 template class ExtendibleHashTable<page_id_t, Page *>;

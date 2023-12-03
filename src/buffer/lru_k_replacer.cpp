@@ -53,7 +53,7 @@ auto LRUKReplacer::CmpTimeStamp(const LRUKReplacer::k_time &t1, const LRUKReplac
 
 void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
   std::scoped_lock<std::mutex> lock(latch_);
-  BUSTUB_ASSERT(replacer_size_ - frame_id > 0, "required frame_id is larger than up bound");
+  // BUSTUB_ASSERT(replacer_size_ - frame_id > 0, "required frame_id is larger than up bound");
 
   // the original count of access
   size_t cnt = frame_info_[frame_id].GetAccessCount();
@@ -74,7 +74,8 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
     }
 
     frames_new_.erase(iter_op.value());
-    frames_new_.push_back(frame_id);
+    frames_new_.emplace_back(frame_id);
+    // frames_new_.push_back(frame_id);
     frame_info_[frame_id].SetVisitIter({std::prev(frames_new_.end())});
   }
 
@@ -115,8 +116,7 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
 void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
   std::scoped_lock<std::mutex> lock(latch_);
   // LOG_DEBUG("SetEvictable: %d, %d", frame_id, set_evictable);
-
-  BUSTUB_ASSERT(replacer_size_ - frame_id > 0, "required frame_id is larger than up bound");
+  // BUSTUB_ASSERT(replacer_size_ - frame_id > 0, "required frame_id is larger than up bound");
 
   if (frame_info_[frame_id].Evictable() == set_evictable) {
     return;
@@ -159,7 +159,8 @@ void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
   curr_size_++;
 
   if (frame_info_[frame_id].GetAccessCount() < k_) {
-    frames_new_.push_back(frame_id);
+    // frames_new_.push_back(frame_id);
+    frames_new_.emplace_back(frame_id);
     frame_info_[frame_id].SetVisitIter({std::prev(frames_new_.end())});
 
   } else {

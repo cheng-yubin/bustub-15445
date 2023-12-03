@@ -183,7 +183,8 @@ auto BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) -> bool {
   page_ptr->is_dirty_ = false;
   page_ptr->pin_count_ = 0;
   page_ptr->page_id_ = INVALID_PAGE_ID;
-  free_list_.push_back(frame_id);
+  // free_list_.push_back(frame_id);
+  free_list_.emplace_back(frame_id);
 
   return true;
 }
