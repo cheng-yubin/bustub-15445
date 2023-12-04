@@ -19,6 +19,7 @@
 #include <memory>
 #include <mutex>  // NOLINT
 #include <optional>
+#include <set>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -29,8 +30,6 @@
 namespace bustub {
 
 class FrameStatus {
-  using k_time = std::pair<frame_id_t, size_t>;
-
  public:
   explicit FrameStatus(size_t k);
   void AddRecord(size_t curr_timestamp);
@@ -40,21 +39,22 @@ class FrameStatus {
   auto Evictable() -> bool;
   void SetEvictable(bool evictable);
 
-  auto GetVisitIter() -> std::optional<std::list<frame_id_t>::iterator>;
-  void SetVisitIter(std::optional<std::list<frame_id_t>::iterator> iter_op);
+  auto GetVisitIter() -> std::optional<std::list<FrameStatus *>::iterator>;
+  void SetVisitIter(std::optional<std::list<FrameStatus *>::iterator> iter_op);
 
-  auto GetCacheIter() -> std::optional<std::list<k_time>::iterator>;
-  void SetCacheIter(std::optional<std::list<k_time>::iterator> iter_op);
+  inline auto GetFrameID() -> frame_id_t { return frame_id_; }
+
+  inline void SetFrameID(frame_id_t frame_id) { frame_id_ = frame_id; }
 
  private:
+  frame_id_t frame_id_;
   const size_t k_;
   size_t access_cnt_;
   bool evictable_;
   std::vector<size_t> hist_;
   int32_t curr_;
 
-  std::optional<std::list<frame_id_t>::iterator> iter_visit_op_;
-  std::optional<std::list<k_time>::iterator> iter_cache_op_;
+  std::optional<std::list<FrameStatus *>::iterator> iter_visit_op_;
 };
 
 /**
@@ -185,17 +185,16 @@ class LRUKReplacer {
   /**
    *
    */
+  class CmpTimeStamp {
+   public:
+    auto operator()(FrameStatus *f1, FrameStatus *f2) const -> bool { return f1->GetTimeStamp() < f2->GetTimeStamp(); }
+  };
 
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
 
-  // std::unordered_map<frame_id_t, size_t> access_cnt_;
-  // std::unordered_map<frame_id_t, std::list<size_t>> access_hist_;
-  // std::unordered_map<frame_id_t, bool> evictable_;
-
-  using k_time = std::pair<frame_id_t, size_t>;
-  std::list<frame_id_t> frames_new_;
-  std::list<k_time> frames_k_;
+  std::list<FrameStatus *> frames_new_;
+  std::set<FrameStatus *, CmpTimeStamp> frames_k_;
 
   size_t curr_size_{0};   // the number of evictable frames.
   size_t replacer_size_;  // the maximum number of the frames allowed.
@@ -205,7 +204,7 @@ class LRUKReplacer {
   std::vector<FrameStatus> frame_info_;
   std::mutex latch_;
 
-  static auto CmpTimeStamp(const k_time &t1, const k_time &t2) -> bool;
+  // static auto CmpTimeStamp() -> bool;
 };
 
 }  // namespace bustub
