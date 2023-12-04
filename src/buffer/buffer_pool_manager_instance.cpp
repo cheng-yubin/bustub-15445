@@ -26,6 +26,7 @@ BufferPoolManagerInstance::BufferPoolManagerInstance(size_t pool_size, DiskManag
   replacer_ = new LRUKReplacer(pool_size, replacer_k);
 
   // Initially, every page is in the free list.
+  free_list_.reserve(pool_size);
   for (size_t i = 0; i < pool_size_; ++i) {
     free_list_.emplace_back(static_cast<int>(i));
   }
@@ -183,7 +184,6 @@ auto BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) -> bool {
   page_ptr->is_dirty_ = false;
   page_ptr->pin_count_ = 0;
   page_ptr->page_id_ = INVALID_PAGE_ID;
-  // free_list_.push_back(frame_id);
   free_list_.emplace_back(frame_id);
 
   return true;
