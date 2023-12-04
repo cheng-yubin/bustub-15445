@@ -193,8 +193,8 @@ class LRUKReplacer {
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
 
-  std::list<FrameStatus *> frames_new_;
-  std::set<FrameStatus *, CmpTimeStamp> frames_k_;
+  std::list<FrameStatus *> frames_visit_;
+  std::set<FrameStatus *, CmpTimeStamp> frames_cache_;
 
   size_t curr_size_{0};   // the number of evictable frames.
   size_t replacer_size_;  // the maximum number of the frames allowed.

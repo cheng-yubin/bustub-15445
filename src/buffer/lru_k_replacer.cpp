@@ -27,23 +27,23 @@ auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
     return false;
   }
 
-  if (!frames_new_.empty()) {
-    FrameStatus *ptr = frames_new_.front();
+  if (!frames_visit_.empty()) {
+    FrameStatus *ptr = frames_visit_.front();
     *frame_id = ptr->GetFrameID();
 
-    frames_new_.pop_front();
+    frames_visit_.pop_front();
     curr_size_--;
 
     ptr->Reset();
     return true;
   }
 
-  if (!frames_k_.empty()) {
-    auto iter = frames_k_.begin();
+  if (!frames_cache_.empty()) {
+    auto iter = frames_cache_.begin();
     FrameStatus *ptr = *iter;
     *frame_id = ptr->GetFrameID();
 
-    frames_k_.erase(iter);
+    frames_cache_.erase(iter);
     curr_size_--;
 
     ptr->Reset();
@@ -74,10 +74,10 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
     if (!iter_op.has_value()) {
       LOG_DEBUG("page is not in the visit list");
     }
-    frames_new_.erase(iter_op.value());
+    frames_visit_.erase(iter_op.value());
 
-    frames_new_.emplace_back(&frame_info_[frame_id]);
-    frame_info_[frame_id].SetVisitIter({std::prev(frames_new_.end())});
+    frames_visit_.emplace_back(&frame_info_[frame_id]);
+    frame_info_[frame_id].SetVisitIter({std::prev(frames_visit_.end())});
   }
 
   // vistt list to cache list
@@ -88,18 +88,18 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
     if (!iter_op.has_value()) {
       LOG_DEBUG("page is not in the cache list");
     }
-    frames_new_.erase(iter_op.value());
+    frames_visit_.erase(iter_op.value());
     frame_info_[frame_id].SetVisitIter(std::nullopt);
 
-    frames_k_.insert(&frame_info_[frame_id]);
+    frames_cache_.insert(&frame_info_[frame_id]);
   }
 
   // cache list to cache list
   if (cnt >= k_) {
-    frames_k_.erase(&frame_info_[frame_id]);
+    frames_cache_.erase(&frame_info_[frame_id]);
     frame_info_[frame_id].AddRecord(curr_timestamp_++);
 
-    frames_k_.insert(&frame_info_[frame_id]);
+    frames_cache_.insert(&frame_info_[frame_id]);
   }
 }
 
@@ -123,11 +123,11 @@ void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
         LOG_DEBUG("page is not in the visit list");
       }
 
-      frames_new_.erase(iter_op.value());
+      frames_visit_.erase(iter_op.value());
       frame_info_[frame_id].SetVisitIter(std::nullopt);
 
     } else {
-      frames_k_.erase(&frame_info_[frame_id]);
+      frames_cache_.erase(&frame_info_[frame_id]);
     }
 
     return;
@@ -143,11 +143,11 @@ void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
   curr_size_++;
 
   if (frame_info_[frame_id].GetAccessCount() < k_) {
-    frames_new_.emplace_back(&frame_info_[frame_id]);
-    frame_info_[frame_id].SetVisitIter({std::prev(frames_new_.end())});
+    frames_visit_.emplace_back(&frame_info_[frame_id]);
+    frame_info_[frame_id].SetVisitIter({std::prev(frames_visit_.end())});
 
   } else {
-    frames_k_.insert(&frame_info_[frame_id]);
+    frames_cache_.insert(&frame_info_[frame_id]);
   }
 }
 
@@ -162,7 +162,7 @@ void LRUKReplacer::Remove(frame_id_t frame_id) {
 
   // fresh the list
   if (frame_info_[frame_id].GetAccessCount() >= k_) {
-    frames_k_.erase(&frame_info_[frame_id]);
+    frames_cache_.erase(&frame_info_[frame_id]);
 
   } else {
     auto iter_op = frame_info_[frame_id].GetVisitIter();
@@ -170,7 +170,7 @@ void LRUKReplacer::Remove(frame_id_t frame_id) {
       LOG_DEBUG("page is not in the visit list");
     }
 
-    frames_new_.erase(iter_op.value());
+    frames_visit_.erase(iter_op.value());
     frame_info_[frame_id].SetVisitIter(std::nullopt);
   }
 
