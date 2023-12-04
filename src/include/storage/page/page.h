@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "common/config.h"
+#include "common/logger.h"
 #include "common/rwlatch.h"
 
 namespace bustub {
@@ -49,16 +50,41 @@ class Page {
   inline auto IsDirty() -> bool { return is_dirty_; }
 
   /** Acquire the page write latch. */
-  inline void WLatch() { rwlatch_.WLock(); }
+  inline void WLatch() {
+    // LOG_DEBUG("wlatch %d", page_id_);
+    rwlatch_.WLock();
+    // wlatch_couut++;
+  }
 
   /** Release the page write latch. */
-  inline void WUnlatch() { rwlatch_.WUnlock(); }
+  inline void WUnlatch() {
+    // LOG_DEBUG("wunlatch %d", page_id_);
+    rwlatch_.WUnlock();
+    // wlatch_couut--;
+  }
 
   /** Acquire the page read latch. */
-  inline void RLatch() { rwlatch_.RLock(); }
+  inline void RLatch() {
+    // LOG_DEBUG("rlatch %d", page_id_);
+    rwlatch_.RLock();
+    // rlatch_count++;
+  }
 
   /** Release the page read latch. */
-  inline void RUnlatch() { rwlatch_.RUnlock(); }
+  inline void RUnlatch() {
+    // LOG_DEBUG("runlatch %d", page_id_);
+    rwlatch_.RUnlock();
+    // rlatch_count--;
+  }
+
+  // inline void Check() {
+  //   if (rlatch_count != 0 || wlatch_couut != 0) {
+  //     LOG_DEBUG("error!");
+  //     LOG_DEBUG("rlatch = %d, wlatch = %d", rlatch_count, wlatch_couut);
+  //   } else {
+  //     LOG_DEBUG("latch balanced");
+  //   }
+  // }
 
   /** @return the page LSN. */
   inline auto GetLSN() -> lsn_t { return *reinterpret_cast<lsn_t *>(GetData() + OFFSET_LSN); }
@@ -88,6 +114,8 @@ class Page {
   bool is_dirty_ = false;
   /** Page latch. */
   ReaderWriterLatch rwlatch_;
-};
 
+  // static int wlatch_couut;
+  // static int rlatch_count;
+};
 }  // namespace bustub

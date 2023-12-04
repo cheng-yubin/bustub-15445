@@ -25,27 +25,146 @@ namespace bustub {
  * max page size
  */
 INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size) {}
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size) {
+  // LOG_DEBUG("internal page init");
+  SetPageType(IndexPageType::INTERNAL_PAGE);
+  SetLSN(INVALID_LSN);
+  SetSize(0);
+  SetMaxSize(max_size);
+  SetParentPageId(parent_id);
+  SetPageId(page_id);
+}
 /*
  * Helper method to get/set the key associated with input "index"(a.k.a
  * array offset)
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::KeyAt(int index) const -> KeyType {
-  // replace with your own code
-  KeyType key{};
-  return key;
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  return array_[index].first;
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyAt(int index, const KeyType &key) {}
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyAt(int index, const KeyType &key) {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  array_[index].first = key;
+}
 
 /*
  * Helper method to get the value associated with input "index"(a.k.a array
  * offset)
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType { return 0; }
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  return array_[index].second;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetValueAt(int index, const ValueType &value) {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  array_[index].second = value;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ItemAt(int index) -> MappingType & {
+  BUSTUB_ASSERT(index >= 0, "index downflow");
+  BUSTUB_ASSERT(index < GetMaxSize(), "index upflow");
+  return array_[index];
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetValue(const KeyType &key, const KeyComparator &comparator) const -> ValueType {
+  ValueType value = ValueAt(GetSize() - 1);
+  for (int index = 1; index < GetSize(); index++) {
+    if (comparator(key, KeyAt(index)) < 0) {
+      value = ValueAt(index - 1);
+      break;
+    }
+  }
+  return value;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::FindValue(const ValueType &value) -> int {
+  for (int i = 0; i < GetSize(); i++) {
+    if (ValueAt(i) == value) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKV(const KeyType &key, const ValueType &value,
+                                              const KeyComparator &comparator) -> bool {
+  if (IsFull()) {
+    LOG_DEBUG("error: array is full when InsertKV, b_plus_tree_leaf_page.cpp");
+    return false;
+  }
+
+  for (int index = GetSize() - 1; index >= 1; index--) {
+    // LOG_DEBUG("index = %d \n", index);
+
+    if (comparator(key, KeyAt(index)) < 0) {
+      array_[index + 1] = array_[index];
+    } else {
+      array_[index + 1].first = key;
+      array_[index + 1].second = value;
+      IncreaseSize(1);
+      return true;
+    }
+  }
+
+  // LOG_DEBUG("Insert to array[1]");
+  array_[1].first = key;
+  array_[1].second = value;
+  IncreaseSize(1);
+  return true;
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::GetSibling(const ValueType &value, ValueType &left_sibling,
+                                                ValueType &right_sibling, const KeyComparator &comparator) {
+  int index = 0;
+  for (; index < GetSize(); index++) {
+    if (value == ValueAt(index)) {
+      break;
+    }
+  }
+
+  BUSTUB_ASSERT(index != GetSize(), "NOT FOUND");
+
+  left_sibling = index > 0 ? ValueAt(index - 1) : INVALID_PAGE_ID;
+  right_sibling = index < (GetSize() - 1) ? ValueAt(index + 1) : INVALID_PAGE_ID;
+
+  int64_t key = KeyAt(index).ToString();
+  int64_t key_left = index > 0 ? KeyAt(index - 1).ToString() : static_cast<int64_t>(0);
+  int64_t key_right = index < (GetSize() - 1) ? KeyAt(index + 1).ToString() : static_cast<int64_t>(0);
+
+  LOG_DEBUG("index = %d, size = %d, id = %d, left_id = %d, right_id = %d", index, GetSize(), value, left_sibling,
+            right_sibling);
+  LOG_DEBUG("key = %ld, left_key = %ld, right_key = %ld", key, key_left, key_right);
+
+  BUSTUB_ASSERT(value != left_sibling, "equal to left");
+  BUSTUB_ASSERT(value != right_sibling, "equal to right");
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::RemoveKV(const int index) -> bool {
+  BUSTUB_ASSERT(index >= 0, "index downflow.");
+  BUSTUB_ASSERT(index < GetSize(), "index upflow.");
+
+  for (int i = index; i < GetSize() - 1; i++) {
+    array_[i] = array_[i + 1];
+  }
+  IncreaseSize(-1);
+  return true;
+}
 
 // valuetype for internalNode should be page id_t
 template class BPlusTreeInternalPage<GenericKey<4>, page_id_t, GenericComparator<4>>;

@@ -113,15 +113,18 @@ class ExtendibleHashTable : public HashTable<K, V> {
     explicit Bucket(size_t size, int depth = 0);
 
     /** @brief Check if a bucket is full. */
-    inline auto IsFull() const -> bool { return list_.size() == size_; }
+    // inline auto IsFull() const -> bool { return list_.size() == size_; }
+    inline auto IsFull() const -> bool { return curr_size_ == size_; }
 
     /** @brief Get the local depth of the bucket. */
     inline auto GetDepth() const -> int { return depth_; }
 
-    /** @brief Increment the local depth of a bucket. */
     inline void IncrementDepth() { depth_++; }
 
-    inline auto GetItems() -> std::list<std::pair<K, V>> & { return list_; }
+    // inline auto GetItems() -> std::list<std::pair<K, V>> & { return list_; }
+    inline auto GetItems() -> std::vector<std::pair<K, V>> & { return vec_; }
+
+    inline auto GetCurrSize() -> size_t & { return curr_size_; }
 
     /**
      *
@@ -161,7 +164,9 @@ class ExtendibleHashTable : public HashTable<K, V> {
     // TODO(student): You may add additional private members and helper functions
     size_t size_;
     int depth_;
-    std::list<std::pair<K, V>> list_;
+    // std::list<std::pair<K, V>> list_;
+    size_t curr_size_;
+    std::vector<std::pair<K, V>> vec_;
   };
 
  private:
@@ -171,6 +176,7 @@ class ExtendibleHashTable : public HashTable<K, V> {
   int global_depth_;    // The global depth of the directory
   size_t bucket_size_;  // The size of a bucket
   int num_buckets_;     // The number of buckets in the hash table
+
   mutable std::mutex latch_;
   std::vector<std::shared_ptr<Bucket>> dir_;  // The directory of the hash table
 
@@ -180,7 +186,7 @@ class ExtendibleHashTable : public HashTable<K, V> {
    * @brief Redistribute the kv pairs in a full bucket.
    * @param bucket The bucket to be redistributed.
    */
-  auto RedistributeBucket(std::shared_ptr<Bucket> bucket) -> void;
+  auto RedistributeBucket(const K &key) -> void;
 
   /*****************************************************************
    * Must acquire latch_ first before calling the below functions. *
@@ -196,6 +202,9 @@ class ExtendibleHashTable : public HashTable<K, V> {
   auto GetGlobalDepthInternal() const -> int;
   auto GetLocalDepthInternal(int dir_index) const -> int;
   auto GetNumBucketsInternal() const -> int;
+  auto FindInternal(const K &key, V &value) -> bool;
+  auto RemoveInternal(const K &key) -> bool;
+  void InsertInternal(const K &key, const V &value);
 };
 
 }  // namespace bustub

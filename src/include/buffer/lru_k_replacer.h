@@ -12,16 +12,50 @@
 
 #pragma once
 
+#include <algorithm>
+#include <ctime>
 #include <limits>
 #include <list>
+#include <memory>
 #include <mutex>  // NOLINT
+#include <optional>
+#include <set>
 #include <unordered_map>
+#include <utility>
 #include <vector>
-
 #include "common/config.h"
+#include "common/logger.h"
 #include "common/macros.h"
 
 namespace bustub {
+
+class FrameStatus {
+ public:
+  explicit FrameStatus(size_t k);
+  void AddRecord(size_t curr_timestamp);
+  auto GetTimeStamp() -> size_t;
+  void Reset();
+  auto GetAccessCount() -> size_t;
+  auto Evictable() -> bool;
+  void SetEvictable(bool evictable);
+
+  auto GetVisitIter() -> std::optional<std::list<FrameStatus *>::iterator>;
+  void SetVisitIter(std::optional<std::list<FrameStatus *>::iterator> iter_op);
+
+  inline auto GetFrameID() -> frame_id_t { return frame_id_; }
+
+  inline void SetFrameID(frame_id_t frame_id) { frame_id_ = frame_id; }
+
+ private:
+  frame_id_t frame_id_;
+  const size_t k_;
+  size_t access_cnt_;
+  bool evictable_;
+  std::vector<size_t> hist_;
+  int32_t curr_;
+
+  std::optional<std::list<FrameStatus *>::iterator> iter_visit_op_;
+};
 
 /**
  * LRUKReplacer implements the LRU-k replacement policy.
@@ -132,14 +166,45 @@ class LRUKReplacer {
    */
   auto Size() -> size_t;
 
+  /**
+   * @brief Add the frame to EvictList according to its access history when the
+   * frame is set to evictable.
+   */
+  void AddToEvictList(frame_id_t frame_id);
+
+  /**
+   * @brief Remove the frame from EvictList when it is set to unevictable.
+   */
+  void RemoveFromEvictList(frame_id_t frame_id);
+
+  /**
+   * @brief Return whether frame1 should be evicted earlier than frame2.
+   *
+   */
+  auto EvictFirst(frame_id_t frame_id1, frame_id_t frame_id2) -> bool;
+  /**
+   *
+   */
+  class CmpTimeStamp {
+   public:
+    auto operator()(FrameStatus *f1, FrameStatus *f2) const -> bool { return f1->GetTimeStamp() < f2->GetTimeStamp(); }
+  };
+
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
-  // Remove maybe_unused if you start using them.
-  [[maybe_unused]] size_t current_timestamp_{0};
-  [[maybe_unused]] size_t curr_size_{0};
-  [[maybe_unused]] size_t replacer_size_;
-  [[maybe_unused]] size_t k_;
+
+  std::list<FrameStatus *> frames_visit_;
+  std::set<FrameStatus *, CmpTimeStamp> frames_cache_;
+
+  size_t curr_size_{0};   // the number of evictable frames.
+  size_t replacer_size_;  // the maximum number of the frames allowed.
+  size_t k_;
+  size_t curr_timestamp_{0};
+
+  std::vector<FrameStatus> frame_info_;
   std::mutex latch_;
+
+  // static auto CmpTimeStamp() -> bool;
 };
 
 }  // namespace bustub

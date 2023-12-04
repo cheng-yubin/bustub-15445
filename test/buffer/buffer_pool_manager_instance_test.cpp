@@ -23,7 +23,7 @@ namespace bustub {
 
 // NOLINTNEXTLINE
 // Check whether pages containing terminal characters can be recovered
-TEST(BufferPoolManagerInstanceTest, DISABLED_BinaryDataTest) {
+TEST(BufferPoolManagerInstanceTest, BinaryDataTest) {
   const std::string db_name = "test.db";
   const size_t buffer_pool_size = 10;
   const size_t k = 5;
@@ -59,6 +59,7 @@ TEST(BufferPoolManagerInstanceTest, DISABLED_BinaryDataTest) {
   // Scenario: We should be able to create new pages until we fill up the buffer pool.
   for (size_t i = 1; i < buffer_pool_size; ++i) {
     EXPECT_NE(nullptr, bpm->NewPage(&page_id_temp));
+    EXPECT_EQ(page_id_t(i), page_id_temp);
   }
 
   // Scenario: Once the buffer pool is full, we should not be able to create any new pages.
@@ -71,12 +72,15 @@ TEST(BufferPoolManagerInstanceTest, DISABLED_BinaryDataTest) {
     EXPECT_EQ(true, bpm->UnpinPage(i, true));
     bpm->FlushPage(i);
   }
+
   for (int i = 0; i < 5; ++i) {
     EXPECT_NE(nullptr, bpm->NewPage(&page_id_temp));
     bpm->UnpinPage(page_id_temp, false);
   }
+
   // Scenario: We should be able to fetch the data we wrote a while ago.
   page0 = bpm->FetchPage(0);
+  EXPECT_NE(nullptr, page0);
   EXPECT_EQ(0, memcmp(page0->GetData(), random_binary_data, BUSTUB_PAGE_SIZE));
   EXPECT_EQ(true, bpm->UnpinPage(0, true));
 
@@ -89,7 +93,7 @@ TEST(BufferPoolManagerInstanceTest, DISABLED_BinaryDataTest) {
 }
 
 // NOLINTNEXTLINE
-TEST(BufferPoolManagerInstanceTest, DISABLED_SampleTest) {
+TEST(BufferPoolManagerInstanceTest, SampleTest) {
   const std::string db_name = "test.db";
   const size_t buffer_pool_size = 10;
   const size_t k = 5;
@@ -111,6 +115,9 @@ TEST(BufferPoolManagerInstanceTest, DISABLED_SampleTest) {
   // Scenario: We should be able to create new pages until we fill up the buffer pool.
   for (size_t i = 1; i < buffer_pool_size; ++i) {
     EXPECT_NE(nullptr, bpm->NewPage(&page_id_temp));
+    frame_id_t frame_id;
+    bpm->page_table_->Find(page_id_temp, frame_id);
+    EXPECT_EQ(false, bpm->pages_[frame_id].IsDirty());
   }
 
   // Scenario: Once the buffer pool is full, we should not be able to create any new pages.
@@ -122,7 +129,11 @@ TEST(BufferPoolManagerInstanceTest, DISABLED_SampleTest) {
   // there would still be one buffer page left for reading page 0.
   for (int i = 0; i < 5; ++i) {
     EXPECT_EQ(true, bpm->UnpinPage(i, true));
+    frame_id_t frame_id;
+    bpm->page_table_->Find(i, frame_id);
+    EXPECT_EQ(true, bpm->pages_[frame_id].IsDirty());
   }
+
   for (int i = 0; i < 4; ++i) {
     EXPECT_NE(nullptr, bpm->NewPage(&page_id_temp));
   }
@@ -134,8 +145,37 @@ TEST(BufferPoolManagerInstanceTest, DISABLED_SampleTest) {
   // Scenario: If we unpin page 0 and then make a new page, all the buffer pages should
   // now be pinned. Fetching page 0 should fail.
   EXPECT_EQ(true, bpm->UnpinPage(0, true));
+  frame_id_t frame_id;
+  bpm->page_table_->Find(0, frame_id);
+  EXPECT_EQ(true, bpm->pages_[frame_id].IsDirty());
+
   EXPECT_NE(nullptr, bpm->NewPage(&page_id_temp));
   EXPECT_EQ(nullptr, bpm->FetchPage(0));
+
+  // Shutdown the disk manager and remove the temporary file we created.
+  disk_manager->ShutDown();
+  remove("test.db");
+
+  delete bpm;
+  delete disk_manager;
+}
+
+// NOLINTNEXTLINE
+TEST(BufferPoolManagerInstanceTest, PerformanceTest) {
+  const std::string db_name = "test.db";
+  const size_t buffer_pool_size = 10;
+  const size_t k = 5;
+
+  auto *disk_manager = new DiskManager(db_name);
+  auto *bpm = new BufferPoolManagerInstance(buffer_pool_size, disk_manager, k);
+
+  for (int r = 0; r < 10000; r++) {
+    std::vector<page_id_t> pages(buffer_pool_size);
+    for (int i = 0; i < 10; i++) {
+      bpm->NewPage(&pages[i]);
+      bpm->UnpinPage(pages[i], false);
+    }
+  }
 
   // Shutdown the disk manager and remove the temporary file we created.
   disk_manager->ShutDown();

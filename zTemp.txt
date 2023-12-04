@@ -1,0 +1,154 @@
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:19:BPlusTree] DEBUG - leaf_max_size: 3
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:20:BPlusTree] DEBUG - internal_max_size: 5
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 40
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 30
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 22
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 3
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 4
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 7
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 23
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 28
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 33
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 34
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 21
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 12
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 6
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 8
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 10
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 9
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 38
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 35
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 14
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 32
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 27
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 20
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 13
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 24
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 26
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 5
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 39
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 18
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 25
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 16
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 31
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 15
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 29
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 19
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 36
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 17
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 37
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:296:Insert] DEBUG - insert start. key = 2
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 39
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 39
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 39
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:560:Remove] DEBUG - remove end. key = 39 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 25
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 25
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 25
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:560:Remove] DEBUG - remove end. key = 25 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 9
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 9
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 9
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:570:Remove] DEBUG - GetLeafPagePessimistic start key = 9
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:572:Remove] DEBUG - GetLeafPagePessimistic end key = 9
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:595:Remove] DEBUG - Need to Redistribution. key = 9
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:630:RedistributePage] DEBUG - start to borrow, page id = 14
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 1, size = 4, id = 14, left_id = 13, right_id = 31
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 9, left_key = 8, right_key = 10
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:700:BorrowFromSibling] DEBUG - borrow from left sibling, page id = 13
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:790:BorrowFromSibling] DEBUG - borrow from right sibling, page id = 31
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:802:BorrowFromSibling] DEBUG - right sibling, leaf page
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:633:RedistributePage] DEBUG - borrow from sibling succuss.
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:597:Remove] DEBUG - redistribution end. key = 9
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:607:Remove] DEBUG - remove end. key = 9 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 3
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 3
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 3
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:560:Remove] DEBUG - remove end. key = 3 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:570:Remove] DEBUG - GetLeafPagePessimistic start key = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:572:Remove] DEBUG - GetLeafPagePessimistic end key = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:595:Remove] DEBUG - Need to Redistribution. key = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:630:RedistributePage] DEBUG - start to borrow, page id = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 0, size = 5, id = 1, left_id = -1, right_id = 37
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 0, left_key = 0, right_key = 2
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:790:BorrowFromSibling] DEBUG - borrow from right sibling, page id = 37
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:640:RedistributePage] DEBUG - start to merge.
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 0, size = 5, id = 1, left_id = -1, right_id = 37
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 0, left_key = 0, right_key = 2
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:899:Merge] DEBUG - merge with right sibling. 37
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:597:Remove] DEBUG - redistribution end. key = 1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:607:Remove] DEBUG - remove end. key = 1 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 19
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 19
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 19
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:560:Remove] DEBUG - remove end. key = 19 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 13
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 13
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 13
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:560:Remove] DEBUG - remove end. key = 13 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 35
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 35
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 35
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:570:Remove] DEBUG - GetLeafPagePessimistic start key = 35
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:572:Remove] DEBUG - GetLeafPagePessimistic end key = 35
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:595:Remove] DEBUG - Need to Redistribution. key = 35
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:630:RedistributePage] DEBUG - start to borrow, page id = 34
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 2, size = 3, id = 34, left_id = 11, right_id = -1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 35, left_key = 34, right_key = 0
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:700:BorrowFromSibling] DEBUG - borrow from left sibling, page id = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:640:RedistributePage] DEBUG - start to merge.
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 2, size = 3, id = 34, left_id = 11, right_id = -1
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 35, left_key = 34, right_key = 0
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:883:Merge] DEBUG - merge with left sibling, id = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:671:RedistributePage] DEBUG - need to continue to merge.
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:630:RedistributePage] DEBUG - start to borrow, page id = 17
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 2, size = 4, id = 17, left_id = 25, right_id = 36
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 33, left_key = 25, right_key = 36
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:700:BorrowFromSibling] DEBUG - borrow from left sibling, page id = 25
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:731:BorrowFromSibling] DEBUG - left sibling, internal page
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:745:BorrowFromSibling] DEBUG - need latch, page id = 30
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:633:RedistributePage] DEBUG - borrow from sibling succuss.
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:597:Remove] DEBUG - redistribution end. key = 35
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:607:Remove] DEBUG - remove end. key = 35 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:570:Remove] DEBUG - GetLeafPagePessimistic start key = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:572:Remove] DEBUG - GetLeafPagePessimistic end key = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:595:Remove] DEBUG - Need to Redistribution. key = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:630:RedistributePage] DEBUG - start to borrow, page id = 31
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 2, size = 4, id = 31, left_id = 14, right_id = 12
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 11, left_key = 9, right_key = 12
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:700:BorrowFromSibling] DEBUG - borrow from left sibling, page id = 14
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:790:BorrowFromSibling] DEBUG - borrow from right sibling, page id = 12
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:640:RedistributePage] DEBUG - start to merge.
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 2, size = 4, id = 31, left_id = 14, right_id = 12
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 11, left_key = 9, right_key = 12
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:883:Merge] DEBUG - merge with left sibling, id = 14
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:597:Remove] DEBUG - redistribution end. key = 11
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:607:Remove] DEBUG - remove end. key = 11 
+
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:531:Remove] DEBUG - remove start. key = 33
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:541:Remove] DEBUG - GetLeafPageOptimistic start key = 33
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:543:Remove] DEBUG - GetLeafPageOptimistic end key = 33
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:570:Remove] DEBUG - GetLeafPagePessimistic start key = 33
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:572:Remove] DEBUG - GetLeafPagePessimistic end key = 33
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:595:Remove] DEBUG - Need to Redistribution. key = 33
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/index/b_plus_tree.cpp:630:RedistributePage] DEBUG - start to borrow, page id = 10
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:150:GetSibling] DEBUG - index = 1, size = 3, id = 10, left_id = 30, right_id = 10
+2023-07-26 22:46:57 [home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:151:GetSibling] DEBUG - key = 33, left_key = 31, right_key = 33
+b_plus_tree_concurrent_test: /home/cyb/work/lessons/cmu-15445/project/bustub-20221128-2022fall/src/storage/page/b_plus_tree_internal_page.cpp:154: void bustub::BPlusTreeInternalPage<bustub::GenericKey<8>, int, bustub::GenericComparator<8>>::GetSibling(const ValueType &, ValueType &, ValueType &, const KeyComparator &) [KeyType = bustub::GenericKey<8>, ValueType = int, KeyComparator = bustub::GenericComparator<8>]: Assertion `(value != right_sibling) && ("equal to right")' failed.
+已放弃 (核心已转储)

@@ -40,10 +40,30 @@ class BPlusTreeInternalPage : public BPlusTreePage {
 
   auto KeyAt(int index) const -> KeyType;
   void SetKeyAt(int index, const KeyType &key);
+
   auto ValueAt(int index) const -> ValueType;
+  void SetValueAt(int index, const ValueType &value);
+
+  auto ItemAt(int index) -> MappingType &;
+
+  // 已知value,修改key
+  auto FindValue(const ValueType &value) -> int;
+
+  // 已知key，查找value
+  auto GetValue(const KeyType &key, const KeyComparator &comparator) const -> ValueType;
+
+  // 插入KV
+  auto InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool;
+
+  // 查找左右兄弟节点
+  void GetSibling(const ValueType &value, ValueType &left_sibling, ValueType &right_sibling,
+                  const KeyComparator &comparator);
+
+  // 删除KV
+  auto RemoveKV(int index) -> bool;
 
  private:
   // Flexible array member for page data.
-  MappingType array_[1];
+  MappingType array_[INTERNAL_PAGE_SIZE];
 };
 }  // namespace bustub

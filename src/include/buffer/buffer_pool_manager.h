@@ -37,6 +37,8 @@ class BufferPoolManager {
    */
   virtual ~BufferPoolManager() = default;
 
+  // virtual auto DebugGetSize() -> int { return 0; }
+
   /** Grading function. Do not modify! */
   auto FetchPage(page_id_t page_id, bufferpool_callback_fn callback = nullptr) -> Page * {
     GradingCallback(callback, CallbackType::BEFORE, page_id);
@@ -86,6 +88,8 @@ class BufferPoolManager {
 
   /** @return size of the buffer pool */
   virtual auto GetPoolSize() -> size_t = 0;
+
+  // virtual void CheckLatch() = 0;
 
  protected:
   /**
