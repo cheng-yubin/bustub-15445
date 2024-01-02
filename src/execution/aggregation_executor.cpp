@@ -44,6 +44,7 @@ void AggregationExecutor::Init() {
     auto value = MakeAggregateValue(&tuple);
     aht_.InsertCombine(key, value);
   }
+  
   aht_iterator_ = aht_.Begin();
 }
 

@@ -79,6 +79,14 @@ class LockManager {
   LockManager() {
     enable_cycle_detection_ = true;
     cycle_detection_thread_ = new std::thread(&LockManager::RunCycleDetection, this);
+
+    incompatible_mode_[LockMode::INTENTION_SHARED] = {LockMode::EXCLUSIVE};
+    incompatible_mode_[LockMode::SHARED] = {LockMode::INTENTION_EXCLUSIVE, LockMode::SHARED_INTENTION_EXCLUSIVE, LockMode::EXCLUSIVE};
+    incompatible_mode_[LockMode::INTENTION_EXCLUSIVE] = {LockMode::SHARED, LockMode::SHARED_INTENTION_EXCLUSIVE, LockMode::EXCLUSIVE};
+    incompatible_mode_[LockMode::SHARED_INTENTION_EXCLUSIVE] = {LockMode::SHARED, LockMode::INTENTION_EXCLUSIVE,
+                                                               LockMode::SHARED_INTENTION_EXCLUSIVE, LockMode::EXCLUSIVE};
+    incompatible_mode_[LockMode::EXCLUSIVE] = {LockMode::INTENTION_SHARED, LockMode::SHARED, LockMode::INTENTION_EXCLUSIVE, 
+                                              LockMode::SHARED_INTENTION_EXCLUSIVE, LockMode::EXCLUSIVE};
   }
 
   ~LockManager() {
@@ -203,6 +211,11 @@ class LockManager {
    *    appropriately (check transaction.h)
    */
 
+  void CheckLockModeLegal(Transaction *txn, LockMode lock_mode);
+  auto CheckLockUpgradeLegal(Transaction *txn, LockMode lock_mode, const table_oid_t &oid) -> int;
+  auto LockManager::AssignTableLock(Transaction *txn, LockMode lock_mode, const std::shared_ptr<LockRequestQueue> lock_queue) -> bool;
+
+  auto LockManager::GetUnlockMode(Transaction *txn, const table_oid_t &oid) -> LockMode;
   /**
    * Acquire a lock on table_oid_t in the given lock_mode.
    * If the transaction already holds a lock on the table, upgrade the lock
@@ -308,6 +321,8 @@ class LockManager {
   std::unordered_map<RID, std::shared_ptr<LockRequestQueue>> row_lock_map_;
   /** Coordination */
   std::mutex row_lock_map_latch_;
+
+  std::unordered_map<LockMode, std::vector<LockMode>> incompatible_mode_;
 
   std::atomic<bool> enable_cycle_detection_;
   std::thread *cycle_detection_thread_;
