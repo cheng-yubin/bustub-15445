@@ -44,18 +44,6 @@ storage/disk/disk_manager.h
 storage/page/page.h
 ../src/include/buffer/storage/page/page.h
 
-../src/include/buffer/clock_replacer.h
-list
--
-mutex
--
-vector
--
-buffer/replacer.h
-../src/include/buffer/buffer/replacer.h
-common/config.h
-../src/include/buffer/common/config.h
-
 ../src/include/buffer/lru_k_replacer.h
 algorithm
 -
@@ -384,15 +372,7 @@ common/logger.h
 common/macros.h
 /home/cyb/cmu15445/bustub-15445/src/buffer/common/macros.h
 
-/home/cyb/cmu15445/bustub-15445/src/buffer/clock_replacer.cpp
-buffer/clock_replacer.h
-/home/cyb/cmu15445/bustub-15445/src/buffer/buffer/clock_replacer.h
-
 /home/cyb/cmu15445/bustub-15445/src/buffer/lru_k_replacer.cpp
 buffer/lru_k_replacer.h
 /home/cyb/cmu15445/bustub-15445/src/buffer/buffer/lru_k_replacer.h
-
-/home/cyb/cmu15445/bustub-15445/src/buffer/lru_replacer.cpp
-buffer/lru_replacer.h
-/home/cyb/cmu15445/bustub-15445/src/buffer/buffer/lru_replacer.h
 

@@ -36,7 +36,7 @@ class TransactionManager;
 class LockManager {
  public:
   enum class LockMode { SHARED, EXCLUSIVE, INTENTION_SHARED, INTENTION_EXCLUSIVE, SHARED_INTENTION_EXCLUSIVE };
-
+  enum class ResourceType {TBALE, ROW};
   /**
    * Structure to hold a lock request.
    * This could be a lock request on a table OR a row.
@@ -211,11 +211,19 @@ class LockManager {
    *    appropriately (check transaction.h)
    */
 
-  void CheckLockModeLegal(Transaction *txn, LockMode lock_mode);
-  auto CheckLockUpgradeLegal(Transaction *txn, LockMode lock_mode, const table_oid_t &oid) -> int;
-  auto LockManager::AssignTableLock(Transaction *txn, LockMode lock_mode, const std::shared_ptr<LockRequestQueue> lock_queue) -> bool;
+  void CheckLockModeLegal(Transaction *txn, LockMode lock_mode, ResourceType type);
+  // auto CheckTableLockUpgradeLegal(Transaction *txn, LockMode lock_mode, const table_oid_t &oid) -> int;
+  // auto CheckRowLockUpgradeLegal(Transaction *txn, LockMode lock_mode, const table_oid_t &oid, const RID &rid) -> int;
+  auto CheckLockUpgradeLegal(Transaction *txn, ResourceType type, LockMode lock_mode, const table_oid_t &oid, const RID &rid) -> int;
+  
+  auto AssignLock(Transaction *txn, LockMode lock_mode, const std::shared_ptr<LockRequestQueue> lock_queue, ResourceType type) -> bool;  
 
-  auto LockManager::GetUnlockMode(Transaction *txn, const table_oid_t &oid) -> LockMode;
+  auto GetUnlockMode(Transaction *txn, ResourceType type, const table_oid_t &oid, const RID &rid) -> LockMode;
+
+  void InsertLockSet(Transaction *txn, ResourceType type, LockMode lock_mode, const table_oid_t& oid, const RID& rid);
+  void EraseLockSet(Transaction *txn, ResourceType type, LockMode lock_mode, const table_oid_t& oid, const RID& rid);
+  
+  void TxnStates2Shrinking(Transaction *txn, LockMode lock_mode);
   /**
    * Acquire a lock on table_oid_t in the given lock_mode.
    * If the transaction already holds a lock on the table, upgrade the lock

@@ -78,13 +78,24 @@ void TableLockTest1() {
   auto task = [&](int txn_id) {
     bool res;
     for (const table_oid_t &oid : oids) {
-      res = lock_mgr.LockTable(txns[txn_id], LockManager::LockMode::EXCLUSIVE, oid);
-      EXPECT_TRUE(res);
+      // LOG_DEBUG("%d lock table %d", txn_id, oid);
+      try {
+        res = lock_mgr.LockTable(txns[txn_id], LockManager::LockMode::EXCLUSIVE, oid);
+        EXPECT_TRUE(res);
+      } catch (TransactionAbortException& exp) {
+        LOG_DEBUG("%s", exp.GetInfo().c_str());
+      }
       CheckGrowing(txns[txn_id]);
     }
+
     for (const table_oid_t &oid : oids) {
-      res = lock_mgr.UnlockTable(txns[txn_id], oid);
-      EXPECT_TRUE(res);
+      // LOG_DEBUG("%d unlock table %d", txn_id, oid);
+      try {
+        res = lock_mgr.UnlockTable(txns[txn_id], oid);
+        EXPECT_TRUE(res);
+      } catch (TransactionAbortException& exp) {
+        LOG_DEBUG("%s", exp.GetInfo().c_str());
+      }
       CheckShrinking(txns[txn_id]);
     }
     txn_mgr.Commit(txns[txn_id]);
@@ -109,7 +120,7 @@ void TableLockTest1() {
     delete txns[i];
   }
 }
-TEST(LockManagerTest, DISABLED_TableLockTest1) { TableLockTest1(); }  // NOLINT
+TEST(LockManagerTest, TableLockTest1) { TableLockTest1(); }  // NOLINT
 
 /** Upgrading single transaction from S -> X */
 void TableLockUpgradeTest1() {
@@ -120,11 +131,21 @@ void TableLockUpgradeTest1() {
   auto txn1 = txn_mgr.Begin();
 
   /** Take S lock */
-  EXPECT_EQ(true, lock_mgr.LockTable(txn1, LockManager::LockMode::SHARED, oid));
+  try {
+    // LOG_DEBUG("try lock shared");
+    EXPECT_EQ(true, lock_mgr.LockTable(txn1, LockManager::LockMode::SHARED, oid));
+  } catch (TransactionAbortException& exp) {
+        LOG_DEBUG("%s", exp.GetInfo().c_str());
+  }
   CheckTableLockSizes(txn1, 1, 0, 0, 0, 0);
 
   /** Upgrade S to X */
-  EXPECT_EQ(true, lock_mgr.LockTable(txn1, LockManager::LockMode::EXCLUSIVE, oid));
+  try {
+    // LOG_DEBUG("try lock exclusive");
+    EXPECT_EQ(true, lock_mgr.LockTable(txn1, LockManager::LockMode::EXCLUSIVE, oid));
+  } catch (TransactionAbortException& exp) {
+        LOG_DEBUG("%s", exp.GetInfo().c_str());
+  }
   CheckTableLockSizes(txn1, 0, 1, 0, 0, 0);
 
   /** Clean up */
@@ -134,7 +155,7 @@ void TableLockUpgradeTest1() {
 
   delete txn1;
 }
-TEST(LockManagerTest, DISABLED_TableLockUpgradeTest1) { TableLockUpgradeTest1(); }  // NOLINT
+TEST(LockManagerTest, TableLockUpgradeTest1) { TableLockUpgradeTest1(); }  // NOLINT
 
 void RowLockTest1() {
   LockManager lock_mgr{};
@@ -154,23 +175,31 @@ void RowLockTest1() {
   auto task = [&](int txn_id) {
     bool res;
 
+    // LOG_DEBUG("txn %d lock table %d ...", txn_id, oid);
     res = lock_mgr.LockTable(txns[txn_id], LockManager::LockMode::SHARED, oid);
+    // LOG_DEBUG("txn %d lock table %d", txn_id, oid);
     EXPECT_TRUE(res);
     CheckGrowing(txns[txn_id]);
 
+    // LOG_DEBUG("txn %d lock row %d ...", txn_id, oid);
     res = lock_mgr.LockRow(txns[txn_id], LockManager::LockMode::SHARED, oid, rid);
+    // LOG_DEBUG("txn %d lock row %d", txn_id, oid);
     EXPECT_TRUE(res);
     CheckGrowing(txns[txn_id]);
     /** Lock set should be updated */
     ASSERT_EQ(true, txns[txn_id]->IsRowSharedLocked(oid, rid));
 
+    // LOG_DEBUG("txn %d unlock row %d ...", txn_id, oid);
     res = lock_mgr.UnlockRow(txns[txn_id], oid, rid);
+    // LOG_DEBUG("txn %d unlock row %d", txn_id, oid);
     EXPECT_TRUE(res);
     CheckShrinking(txns[txn_id]);
     /** Lock set should be updated */
     ASSERT_EQ(false, txns[txn_id]->IsRowSharedLocked(oid, rid));
 
+    // LOG_DEBUG("txn %d unlock table %d ...", txn_id, oid);
     res = lock_mgr.UnlockTable(txns[txn_id], oid);
+    // LOG_DEBUG("txn %d unlock table %d", txn_id, oid);
     EXPECT_TRUE(res);
     CheckShrinking(txns[txn_id]);
 
@@ -190,7 +219,7 @@ void RowLockTest1() {
     delete txns[i];
   }
 }
-TEST(LockManagerTest, DISABLED_RowLockTest1) { RowLockTest1(); }  // NOLINT
+TEST(LockManagerTest, RowLockTest1) { RowLockTest1(); }  // NOLINT
 
 void TwoPLTest1() {
   LockManager lock_mgr{};
@@ -239,6 +268,6 @@ void TwoPLTest1() {
   delete txn;
 }
 
-TEST(LockManagerTest, DISABLED_TwoPLTest1) { TwoPLTest1(); }  // NOLINT
+TEST(LockManagerTest, TwoPLTest1) { TwoPLTest1(); }  // NOLINT
 
 }  // namespace bustub

@@ -408,10 +408,6 @@ format-inl.h
 recovery/checkpoint_manager.h
 /home/cyb/cmu15445/bustub-15445/src/recovery/recovery/checkpoint_manager.h
 
-/home/cyb/cmu15445/bustub-15445/src/recovery/log_manager.cpp
-recovery/log_manager.h
-/home/cyb/cmu15445/bustub-15445/src/recovery/recovery/log_manager.h
-
 /home/cyb/cmu15445/bustub-15445/src/recovery/log_recovery.cpp
 recovery/log_recovery.h
 /home/cyb/cmu15445/bustub-15445/src/recovery/recovery/log_recovery.h
