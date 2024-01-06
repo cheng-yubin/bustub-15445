@@ -21,6 +21,8 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <queue>
+#include <set>
 
 #include "common/config.h"
 #include "common/rid.h"
@@ -318,6 +320,12 @@ class LockManager {
    */
   auto RunCycleDetection() -> void;
 
+  void BuildWaitsForMap();
+
+  void AbortTxn(txn_id_t txn_id);
+
+  auto DFS(txn_id_t curr, std::set<txn_id_t>& not_visited, std::unordered_map<txn_id_t, txn_id_t>& path, txn_id_t *txn_id) -> bool;
+ 
  private:
   /** Fall 2022 */
   /** Structure that holds lock requests for a given table oid */

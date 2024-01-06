@@ -140,6 +140,18 @@ auto LockManager::LockTable(Transaction *txn, LockMode lock_mode, const table_oi
     // 检查本事务能否被授予锁
     while (!AssignLock(txn, lock_mode, lock_queue, ResourceType::TBALE)) {
       lock_queue->cv_.wait(lck);
+      // 事务可能在waiting过程中，由于死锁检测被设置为aborted，需要取消请求
+      if (txn->GetState() == TransactionState::ABORTED) {
+        for (auto iter = lock_queue->request_queue_.begin(); iter != lock_queue->request_queue_.end(); iter++) {
+          LockRequest* request = *iter;
+          if (request->txn_id_ == txn->GetTransactionId() && !request->granted_ && request->lock_mode_ == lock_mode) {
+            lock_queue->request_queue_.erase(iter);
+            delete request;
+            break;
+          }
+        }
+        return false;
+      }
     }
 
     return true;
@@ -185,6 +197,18 @@ auto LockManager::LockRow(Transaction *txn, LockMode lock_mode, const table_oid_
   // 检查本事务能否被授予锁
   while (!AssignLock(txn, lock_mode, lock_queue, ResourceType::ROW)) {
     lock_queue->cv_.wait(lck);
+    // 事务可能在waiting过程中，由于死锁检测被设置为aborted
+    if (txn->GetState() == TransactionState::ABORTED) {
+      for (auto iter = lock_queue->request_queue_.begin(); iter != lock_queue->request_queue_.end(); iter++) {
+        LockRequest* request = *iter;
+        if (request->txn_id_ == txn->GetTransactionId() && !request->granted_ && request->lock_mode_ == lock_mode) {
+          lock_queue->request_queue_.erase(iter);
+          delete request;
+          break;
+        }
+      }
+      return false;
+    }
   }
   return true;
 }
@@ -520,21 +544,180 @@ void LockManager::InsertLockSet(Transaction *txn, ResourceType type, LockMode lo
   }
 }
 
-void LockManager::AddEdge(txn_id_t t1, txn_id_t t2) {}
+void LockManager::AddEdge(txn_id_t t1, txn_id_t t2) {
+  // t1 is waiting for t2
+  std::lock_guard<std::mutex> lck(waits_for_latch_);
+  waits_for_[t1].push_back(t2);
+}
 
-void LockManager::RemoveEdge(txn_id_t t1, txn_id_t t2) {}
+void LockManager::RemoveEdge(txn_id_t t1, txn_id_t t2) {
+  std::lock_guard<std::mutex> lck(waits_for_latch_);
+  std::vector<txn_id_t>& txn_vec = waits_for_[t1];
+  txn_vec.erase(std::remove(txn_vec.begin(), txn_vec.end(), t2), txn_vec.end());
+}
 
-auto LockManager::HasCycle(txn_id_t *txn_id) -> bool { return false; }
+auto LockManager::DFS(txn_id_t curr, std::set<txn_id_t>& not_visited, std::unordered_map<txn_id_t, txn_id_t>& path, txn_id_t *txn_id) -> bool {
+  not_visited.erase(curr);
+
+  // 如果该节点在path中，表明成环
+  if (path.find(curr) != path.end()) {
+    txn_id_t max_txn = curr;
+    txn_id_t next = path[curr];
+    while (next != curr) {
+      max_txn = std::max(max_txn, next);
+      next = path[next];
+    }
+    *txn_id = max_txn;
+    return true;
+  }
+
+  for (auto neighbor : waits_for_[curr]) {  // neibor从小到大排列
+    path[curr] = neighbor;
+    if (DFS(neighbor, not_visited, path, txn_id)) {
+      return true;
+    }
+  }
+  path.erase(curr);
+
+  return false;
+}
+
+auto LockManager::HasCycle(txn_id_t *txn_id) -> bool { 
+  std::set<txn_id_t> not_visited;
+  for (auto& kv : waits_for_) {
+    not_visited.insert(kv.first);
+  }
+
+  while (!not_visited.empty()) {
+    // 从未被访问的最小节点开始DFS遍历
+    // 若DFS返回false，表明访问到的所有节点都不是环的一部分，就需要再以该节点为起点进行DFS，减少不必要的遍历
+    // 若DFS返回true，表明找到环，直接返回
+    std::unordered_map<txn_id_t, txn_id_t> path;
+    if (DFS(*not_visited.begin(), not_visited, path, txn_id)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+void LockManager::BuildWaitsForMap() {
+  std::unique_lock<std::mutex> table_lck(table_lock_map_latch_);
+  for (auto& kv : table_lock_map_) {
+    std::lock_guard<std::mutex> queue_lck(kv.second->latch_);
+    std::list<LockRequest *>& request_queue = kv.second->request_queue_;
+    for (auto request1 : request_queue) {
+      for (auto request2 : request_queue) {
+        // request1 等待 request2
+        if (request1 != request2 && !request1->granted_ && request2->granted_) {
+          AddEdge(request1->txn_id_, request2->txn_id_);
+        }
+      }
+    }
+  }
+  table_lck.unlock();
+
+  std::unique_lock<std::mutex> row_lck(row_lock_map_latch_);
+  for (auto& kv : row_lock_map_) {
+    std::lock_guard<std::mutex> queue_lck(kv.second->latch_);
+    std::list<LockRequest *>& request_queue = kv.second->request_queue_;
+    for (auto request1 : request_queue) {
+      for (auto request2 : request_queue) {
+        // request1 等待 request2
+        if (request1 != request2 && !request1->granted_ && request2->granted_) {
+          AddEdge(request1->txn_id_, request2->txn_id_);
+        }
+      }
+    }
+  }
+  row_lck.unlock();
+
+  // 对waits_for中各节点的后继节点进行排序，保证有序的遍历
+  for (auto& kv : waits_for_) {
+    std::sort(kv.second.begin(), kv.second.end());
+  }
+}
 
 auto LockManager::GetEdgeList() -> std::vector<std::pair<txn_id_t, txn_id_t>> {
-  std::vector<std::pair<txn_id_t, txn_id_t>> edges(0);
+  std::lock_guard<std::mutex> lck(waits_for_latch_);
+  std::vector<std::pair<txn_id_t, txn_id_t>> edges;
+  for (auto& kv : waits_for_) {
+    for (auto& t2 : kv.second) {
+      edges.emplace_back(kv.first, t2);
+    }
+  }
   return edges;
+}
+
+void LockManager::AbortTxn(txn_id_t txn_id) {
+  Transaction* txn = TransactionManager::GetTransaction(txn_id);
+  txn->SetState(TransactionState::ABORTED);
+
+  // 释放该Txn持有的所有锁，先行锁再表锁
+  auto row_lock_set = txn->GetExclusiveRowLockSet();
+  std::unordered_map<table_oid_t, std::unordered_set<RID>> row_set = *row_lock_set;
+  for (auto& kv : row_set) {
+    for (auto rid : kv.second) {
+      UnlockRow(txn, kv.first, rid);
+    }
+  }
+
+  row_lock_set = txn->GetSharedRowLockSet();
+  row_set = *row_lock_set;
+  for (auto& kv : row_set) {
+    for (auto rid : kv.second) {
+      UnlockRow(txn, kv.first, rid);
+    }
+  }
+
+  auto table_lock_set = txn->GetSharedTableLockSet();
+  std::unordered_set<table_oid_t> table_set = *table_lock_set;
+  for (auto oid : table_set) {
+    UnlockTable(txn, oid);
+  }
+
+  table_lock_set = txn->GetExclusiveTableLockSet();
+  table_set = *table_lock_set;
+  for (auto oid : table_set) {
+    UnlockTable(txn, oid);
+  }
+
+  table_lock_set = txn->GetIntentionSharedTableLockSet();
+  table_set = *table_lock_set;
+  for (auto oid : table_set) {
+    UnlockTable(txn, oid);
+  }
+
+  table_lock_set = txn->GetIntentionExclusiveTableLockSet();
+  table_set = *table_lock_set;
+  for (auto oid : table_set) {
+    UnlockTable(txn, oid);
+  }
+
+  table_lock_set = txn->GetSharedIntentionExclusiveTableLockSet();
+  table_set = *table_lock_set;
+  for (auto oid : table_set) {
+    UnlockTable(txn, oid);
+  }
+
+  // 修改wait_for, 清除txn_id的全部依赖关系，使环断开
+  std::lock_guard<std::mutex> lck(waits_for_latch_);
+  waits_for_.erase(txn_id);
 }
 
 void LockManager::RunCycleDetection() {
   while (enable_cycle_detection_) {
     std::this_thread::sleep_for(cycle_detection_interval);
     {  // TODO(students): detect deadlock
+    try {
+      BuildWaitsForMap();
+      txn_id_t txn_abort;
+      while (HasCycle(&txn_abort)) {
+        AbortTxn(txn_abort);
+      }
+    } catch (TransactionAbortException& exp) {
+          LOG_DEBUG("%s", exp.GetInfo().c_str());
+    }
     }
   }
 }

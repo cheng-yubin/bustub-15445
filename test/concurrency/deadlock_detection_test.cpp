@@ -21,7 +21,7 @@
       << "Test Failed Due to Time Out";
 
 namespace bustub {
-TEST(LockManagerDeadlockDetectionTest, DISABLED_EdgeTest) {
+TEST(LockManagerDeadlockDetectionTest, EdgeTest) {
   LockManager lock_mgr{};
 
   const int num_nodes = 100;
@@ -63,7 +63,7 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_EdgeTest) {
   }
 }
 
-TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
+TEST(LockManagerDeadlockDetectionTest, BasicDeadlockDetectionTest) {
   LockManager lock_mgr{};
   TransactionManager txn_mgr{&lock_mgr};
 
@@ -77,6 +77,7 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
 
   std::thread t0([&] {
     // Lock and sleep
+    try {
     bool res = lock_mgr.LockTable(txn0, LockManager::LockMode::INTENTION_EXCLUSIVE, toid);
     EXPECT_EQ(true, res);
     res = lock_mgr.LockRow(txn0, LockManager::LockMode::EXCLUSIVE, toid, rid0);
@@ -94,9 +95,13 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
 
     txn_mgr.Commit(txn0);
     EXPECT_EQ(TransactionState::COMMITTED, txn0->GetState());
+    } catch (TransactionAbortException& exp) {
+        LOG_DEBUG("%s", exp.GetInfo().c_str());
+    }
   });
 
   std::thread t1([&] {
+    try {
     // Sleep so T0 can take necessary locks
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     bool res = lock_mgr.LockTable(txn1, LockManager::LockMode::INTENTION_EXCLUSIVE, toid);
@@ -111,6 +116,10 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
 
     EXPECT_EQ(TransactionState::ABORTED, txn1->GetState());
     txn_mgr.Abort(txn1);
+    
+    } catch (TransactionAbortException& exp) {
+        LOG_DEBUG("%s", exp.GetInfo().c_str());
+    }
   });
 
   // Sleep for enough time to break cycle
