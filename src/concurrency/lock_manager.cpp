@@ -19,6 +19,8 @@
 namespace bustub {
 
 auto LockManager::AssignLock(Transaction *txn, LockMode lock_mode, const std::shared_ptr<LockRequestQueue> lock_queue, ResourceType type) -> bool {
+  LOG_DEBUG("AssignLock called. txn = %d, lock_mode = %d", txn->GetTransactionId(), int(lock_mode));
+  
   std::unordered_map<LockMode, bool> lock_allowed = {};
   int count;
 
@@ -96,6 +98,7 @@ auto LockManager::AssignLock(Transaction *txn, LockMode lock_mode, const std::sh
 }
 
 auto LockManager::LockTable(Transaction *txn, LockMode lock_mode, const table_oid_t &oid) -> bool { 
+    LOG_DEBUG("LockTable called. txn = %d, lock_mode = %d", txn->GetTransactionId(), int(lock_mode));
     // 检查当前隔离等级、事务状态、资源类型下，请求获取的锁类型是否合法
     CheckLockModeLegal(txn, lock_mode, ResourceType::TBALE);
 
@@ -126,6 +129,7 @@ auto LockManager::LockTable(Transaction *txn, LockMode lock_mode, const table_oi
         lock_queue->upgrading_ = txn->GetTransactionId();
       } else {
         // 存在尚未处理的upgrade请求
+        delete req;
         txn->SetState(TransactionState::ABORTED);
         throw TransactionAbortException(txn->GetTransactionId(), AbortReason::UPGRADE_CONFLICT);
       }
@@ -139,6 +143,8 @@ auto LockManager::LockTable(Transaction *txn, LockMode lock_mode, const table_oi
 
     // 检查本事务能否被授予锁
     while (!AssignLock(txn, lock_mode, lock_queue, ResourceType::TBALE)) {
+      LOG_DEBUG("AssignLock fail, waiting. txn = %d", txn->GetTransactionId());
+      lock_queue->PrintQueue();
       lock_queue->cv_.wait(lck);
       // 事务可能在waiting过程中，由于死锁检测被设置为aborted，需要取消请求
       if (txn->GetState() == TransactionState::ABORTED) {
@@ -154,6 +160,8 @@ auto LockManager::LockTable(Transaction *txn, LockMode lock_mode, const table_oi
       }
     }
 
+    LOG_DEBUG("AssignLock success, return. txn = %d", txn->GetTransactionId());
+    lock_queue->PrintQueue();
     return true;
  }
 
@@ -184,6 +192,7 @@ auto LockManager::LockRow(Transaction *txn, LockMode lock_mode, const table_oid_
     } else {
       // 存在尚未处理的upgrade请求
       txn->SetState(TransactionState::ABORTED);
+      delete req;
       throw TransactionAbortException(txn->GetTransactionId(), AbortReason::UPGRADE_CONFLICT);
     }
 
@@ -214,6 +223,7 @@ auto LockManager::LockRow(Transaction *txn, LockMode lock_mode, const table_oid_
 }
 
 auto LockManager::UnlockTable(Transaction *txn, const table_oid_t &oid) -> bool { 
+  LOG_DEBUG("UnlockTable called. txn = %d", txn->GetTransactionId());
   // 判断持有目标锁
   RID dummy_rid;
   LockMode lock_mode = GetUnlockMode(txn, ResourceType::TBALE, oid, dummy_rid);
@@ -236,6 +246,14 @@ auto LockManager::UnlockTable(Transaction *txn, const table_oid_t &oid) -> bool 
     // 遍历请求队列，找到该事务对应的锁请求并清除
     if ((*iter)->txn_id_ == txn->GetTransactionId()) {
       LockRequest* req = *iter;
+      if (!(*iter)->granted_) {
+        LOG_DEBUG("try to unlock a unlocked table!, txn = %d", txn->GetTransactionId());
+      }
+
+      if ((*iter)->lock_mode_ != lock_mode) {
+        LOG_DEBUG("unlock mode dismatch, txn = %d, lock mode = %d, but try to unlock = %d", txn->GetTransactionId(), int(lock_mode), int((*iter)->lock_mode_));
+      }
+      
       BUSTUB_ASSERT((*iter)->granted_ == true, "table unlocked");
       BUSTUB_ASSERT((*iter)->lock_mode_ == lock_mode, "lock mode is not match");
       lock_queue->request_queue_.erase(iter);   // 从请求队列中清除
@@ -609,7 +627,7 @@ void LockManager::BuildWaitsForMap() {
     for (auto request1 : request_queue) {
       for (auto request2 : request_queue) {
         // request1 等待 request2
-        if (request1 != request2 && !request1->granted_ && request2->granted_) {
+        if (request1->txn_id_ != request2->txn_id_ && !request1->granted_ && request2->granted_) {
           AddEdge(request1->txn_id_, request2->txn_id_);
         }
       }
@@ -713,6 +731,7 @@ void LockManager::RunCycleDetection() {
       BuildWaitsForMap();
       txn_id_t txn_abort;
       while (HasCycle(&txn_abort)) {
+        LOG_DEBUG("has cycle, abort txn = %d", txn_abort);
         AbortTxn(txn_abort);
       }
     } catch (TransactionAbortException& exp) {

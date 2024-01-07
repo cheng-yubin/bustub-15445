@@ -23,6 +23,7 @@
 #include <vector>
 #include <queue>
 #include <set>
+#include <sstream>
 
 #include "common/config.h"
 #include "common/rid.h"
@@ -73,6 +74,15 @@ class LockManager {
     txn_id_t upgrading_ = INVALID_TXN_ID;
     /** coordination */
     std::mutex latch_;
+
+    void PrintQueue() {
+      std::stringstream buf;
+      buf << "Queue: \n";
+      for (LockRequest *p : request_queue_) {
+        buf << "txn: " << p->txn_id_ << " granted: " << p->granted_ << " lock mode: " << int(p->lock_mode_) << "\n";
+      }
+      LOG_DEBUG("%s", buf.str().c_str());
+    }
   };
 
   /**

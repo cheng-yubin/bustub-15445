@@ -20,7 +20,28 @@ InsertExecutor::InsertExecutor(ExecutorContext *exec_ctx, const InsertPlanNode *
                                std::unique_ptr<AbstractExecutor> &&child_executor)
     : AbstractExecutor(exec_ctx), plan_(plan), child_executor_(std::move(child_executor)) {}
 
-void InsertExecutor::Init() { child_executor_->Init(); }
+void InsertExecutor::Init() { 
+  child_executor_->Init(); 
+  
+  // InsertExecutor table XL : lock XL, unlock when submit/abort
+  Transaction* txn = exec_ctx_->GetTransaction();
+  TransactionManager* txn_mgr = exec_ctx_->GetTransactionManager();
+  LockManager* lock_mgr = exec_ctx_->GetLockManager();
+
+  try {
+    bool locked = lock_mgr->LockTable(txn, LockManager::LockMode::EXCLUSIVE, plan_->TableOid());
+    if (!locked) {
+      std::string msg = "InsertExecutor Lock exclusive fail.";
+      throw ExecutionException(msg);
+    }
+  } catch (TransactionAbortException& exception) {
+    LOG_DEBUG("%s", exception.GetInfo().c_str());
+    txn_mgr->Abort(txn);
+
+    std::string msg = "InsertExecutor Lock exclusive aborted.";
+    throw ExecutionException(msg);
+  }
+}
 
 auto InsertExecutor::Next(Tuple *tuple, RID *rid) -> bool {
   num_inserted_ = 0;

@@ -89,6 +89,7 @@ class TransactionManager {
    * @param txn the transaction whose locks should be released
    */
   void ReleaseLocks(Transaction *txn) {
+    LOG_DEBUG("ReleaseLocks called. txn = %d", txn->GetTransactionId());
     /** Drop all row locks */
     txn->LockTxn();
     std::unordered_map<table_oid_t, std::unordered_set<RID>> row_lock_set;

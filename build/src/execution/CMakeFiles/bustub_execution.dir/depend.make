@@ -79,6 +79,7 @@ src/execution/CMakeFiles/bustub_execution.dir/delete_executor.cpp.o: ../src/incl
 src/execution/CMakeFiles/bustub_execution.dir/delete_executor.cpp.o: ../src/include/common/rwlatch.h
 src/execution/CMakeFiles/bustub_execution.dir/delete_executor.cpp.o: ../src/include/concurrency/lock_manager.h
 src/execution/CMakeFiles/bustub_execution.dir/delete_executor.cpp.o: ../src/include/concurrency/transaction.h
+src/execution/CMakeFiles/bustub_execution.dir/delete_executor.cpp.o: ../src/include/concurrency/transaction_manager.h
 src/execution/CMakeFiles/bustub_execution.dir/delete_executor.cpp.o: ../src/include/container/disk/hash/disk_extendible_hash_table.h
 src/execution/CMakeFiles/bustub_execution.dir/delete_executor.cpp.o: ../src/include/container/hash/hash_function.h
 src/execution/CMakeFiles/bustub_execution.dir/delete_executor.cpp.o: ../src/include/execution/executor_context.h
@@ -141,6 +142,7 @@ src/execution/CMakeFiles/bustub_execution.dir/executor_factory.cpp.o: ../src/inc
 src/execution/CMakeFiles/bustub_execution.dir/executor_factory.cpp.o: ../src/include/common/util/string_util.h
 src/execution/CMakeFiles/bustub_execution.dir/executor_factory.cpp.o: ../src/include/concurrency/lock_manager.h
 src/execution/CMakeFiles/bustub_execution.dir/executor_factory.cpp.o: ../src/include/concurrency/transaction.h
+src/execution/CMakeFiles/bustub_execution.dir/executor_factory.cpp.o: ../src/include/concurrency/transaction_manager.h
 src/execution/CMakeFiles/bustub_execution.dir/executor_factory.cpp.o: ../src/include/container/disk/hash/disk_extendible_hash_table.h
 src/execution/CMakeFiles/bustub_execution.dir/executor_factory.cpp.o: ../src/include/container/hash/hash_function.h
 src/execution/CMakeFiles/bustub_execution.dir/executor_factory.cpp.o: ../src/include/execution/executor_context.h
@@ -473,6 +475,7 @@ src/execution/CMakeFiles/bustub_execution.dir/insert_executor.cpp.o: ../src/incl
 src/execution/CMakeFiles/bustub_execution.dir/insert_executor.cpp.o: ../src/include/common/rwlatch.h
 src/execution/CMakeFiles/bustub_execution.dir/insert_executor.cpp.o: ../src/include/concurrency/lock_manager.h
 src/execution/CMakeFiles/bustub_execution.dir/insert_executor.cpp.o: ../src/include/concurrency/transaction.h
+src/execution/CMakeFiles/bustub_execution.dir/insert_executor.cpp.o: ../src/include/concurrency/transaction_manager.h
 src/execution/CMakeFiles/bustub_execution.dir/insert_executor.cpp.o: ../src/include/container/disk/hash/disk_extendible_hash_table.h
 src/execution/CMakeFiles/bustub_execution.dir/insert_executor.cpp.o: ../src/include/container/hash/hash_function.h
 src/execution/CMakeFiles/bustub_execution.dir/insert_executor.cpp.o: ../src/include/execution/executor_context.h
@@ -896,6 +899,7 @@ src/execution/CMakeFiles/bustub_execution.dir/seq_scan_executor.cpp.o: ../src/in
 src/execution/CMakeFiles/bustub_execution.dir/seq_scan_executor.cpp.o: ../src/include/common/rwlatch.h
 src/execution/CMakeFiles/bustub_execution.dir/seq_scan_executor.cpp.o: ../src/include/concurrency/lock_manager.h
 src/execution/CMakeFiles/bustub_execution.dir/seq_scan_executor.cpp.o: ../src/include/concurrency/transaction.h
+src/execution/CMakeFiles/bustub_execution.dir/seq_scan_executor.cpp.o: ../src/include/concurrency/transaction_manager.h
 src/execution/CMakeFiles/bustub_execution.dir/seq_scan_executor.cpp.o: ../src/include/container/disk/hash/disk_extendible_hash_table.h
 src/execution/CMakeFiles/bustub_execution.dir/seq_scan_executor.cpp.o: ../src/include/container/hash/hash_function.h
 src/execution/CMakeFiles/bustub_execution.dir/seq_scan_executor.cpp.o: ../src/include/execution/executor_context.h
