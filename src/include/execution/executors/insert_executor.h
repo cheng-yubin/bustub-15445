@@ -15,11 +15,11 @@
 #include <memory>
 #include <utility>
 
+#include "concurrency/transaction_manager.h"
 #include "execution/executor_context.h"
 #include "execution/executors/abstract_executor.h"
 #include "execution/plans/insert_plan.h"
 #include "storage/table/tuple.h"
-#include "concurrency/transaction_manager.h"
 
 namespace bustub {
 
@@ -54,6 +54,8 @@ class InsertExecutor : public AbstractExecutor {
 
   /** @return The output schema for the insert */
   auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); };
+
+  void TryLock(LockManager::ResourceType type, LockManager::LockMode lock_mode, RID *rid = nullptr);
 
  private:
   /** The insert plan node to be executed*/

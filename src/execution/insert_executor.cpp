@@ -15,32 +15,51 @@
 #include "common/logger.h"
 
 namespace bustub {
+void InsertExecutor::TryLock(LockManager::ResourceType type, LockManager::LockMode lock_mode, RID *rid) {
+  Transaction *txn = exec_ctx_->GetTransaction();
+  TransactionManager *txn_mgr = exec_ctx_->GetTransactionManager();
+  LockManager *lock_mgr = exec_ctx_->GetLockManager();
+
+  if (type == LockManager::ResourceType::TBALE) {
+    try {
+      bool locked = lock_mgr->LockTable(txn, lock_mode, plan_->TableOid());
+      if (!locked) {
+        txn_mgr->Abort(txn);
+        std::string msg = "InsertExecutor Table IXL fail.";
+        throw ExecutionException(msg);
+      }
+    } catch (TransactionAbortException &exception) {
+      LOG_DEBUG("%s", exception.GetInfo().c_str());
+      txn_mgr->Abort(txn);
+      std::string msg = "InsertExecutor Table IXL aborted.";
+      throw ExecutionException(msg);
+    }
+  } else {
+    try {
+      bool locked = lock_mgr->LockRow(txn, lock_mode, plan_->TableOid(), *rid);
+      if (!locked) {
+        txn_mgr->Abort(txn);
+        std::string msg = "InsertExecutor Row SL fail.";
+        throw ExecutionException(msg);
+      }
+    } catch (TransactionAbortException &exception) {
+      LOG_DEBUG("%s", exception.GetInfo().c_str());
+      txn_mgr->Abort(txn);
+      std::string msg = "InsertExecutor Row SL aborted.";
+      throw ExecutionException(msg);
+    }
+  }
+}
 
 InsertExecutor::InsertExecutor(ExecutorContext *exec_ctx, const InsertPlanNode *plan,
                                std::unique_ptr<AbstractExecutor> &&child_executor)
     : AbstractExecutor(exec_ctx), plan_(plan), child_executor_(std::move(child_executor)) {}
 
-void InsertExecutor::Init() { 
-  child_executor_->Init(); 
-  
-  // InsertExecutor table XL : lock XL, unlock when submit/abort
-  Transaction* txn = exec_ctx_->GetTransaction();
-  TransactionManager* txn_mgr = exec_ctx_->GetTransactionManager();
-  LockManager* lock_mgr = exec_ctx_->GetLockManager();
+void InsertExecutor::Init() {
+  child_executor_->Init();
 
-  try {
-    bool locked = lock_mgr->LockTable(txn, LockManager::LockMode::EXCLUSIVE, plan_->TableOid());
-    if (!locked) {
-      std::string msg = "InsertExecutor Lock exclusive fail.";
-      throw ExecutionException(msg);
-    }
-  } catch (TransactionAbortException& exception) {
-    LOG_DEBUG("%s", exception.GetInfo().c_str());
-    txn_mgr->Abort(txn);
-
-    std::string msg = "InsertExecutor Lock exclusive aborted.";
-    throw ExecutionException(msg);
-  }
+  // InsertExecutor table IXL: unlock when submit/abort
+  TryLock(LockManager::ResourceType::TBALE, LockManager::LockMode::INTENTION_EXCLUSIVE);
 }
 
 auto InsertExecutor::Next(Tuple *tuple, RID *rid) -> bool {
@@ -53,11 +72,11 @@ auto InsertExecutor::Next(Tuple *tuple, RID *rid) -> bool {
     if (!status) {
       break;
     }
-
     num_inserted_++;
 
     // insert the child tuple into table
     bool status_insert = tableinfo->table_->InsertTuple(*tuple, rid, exec_ctx_->GetTransaction());
+    TryLock(LockManager::ResourceType::ROW, LockManager::LockMode::EXCLUSIVE, rid);
 
     if (!status_insert) {
       LOG_DEBUG(" tuple insert fail");
