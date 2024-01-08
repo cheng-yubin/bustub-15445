@@ -52,7 +52,8 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   /** @brief Return the pointer to all the pages in the buffer pool. */
   auto GetPages() -> Page * { return pages_; }
 
- protected:
+  //  protected:
+
   /**
    * TODO(P1): Add implementation
    *
@@ -60,7 +61,7 @@ class BufferPoolManagerInstance : public BufferPoolManager {
    * are currently in use and not evictable (in another word, pinned).
    *
    * You should pick the replacement frame from either the free list or the replacer (always find from the free list
-   * first), and then call the AllocatePage() method to get a new page id. If the replacement frame has a dirty page,
+   * first), an then call the AllocatePage() method to get a new page id. If the redplacement frame has a dirty page,
    * you should write it back to the disk first. You also need to reset the memory and metadata for the new page.
    *
    * Remember to "Pin" the frame by calling replacer.SetEvictable(frame_id, false)
@@ -140,6 +141,7 @@ class BufferPoolManagerInstance : public BufferPoolManager {
    */
   auto DeletePgImp(page_id_t page_id) -> bool override;
 
+  // inline void CheckLatch() override { pages_[0].Check(); }
   /** Number of pages in the buffer pool. */
   const size_t pool_size_;
   /** The next page id to be allocated  */
@@ -150,7 +152,7 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   /** Array of buffer pool pages. */
   Page *pages_;
   /** Pointer to the disk manager. */
-  DiskManager *disk_manager_ __attribute__((__unused__));
+  DiskManager *disk_manager_;
   /** Pointer to the log manager. Please ignore this for P1. */
   LogManager *log_manager_ __attribute__((__unused__));
   /** Page table for keeping track of buffer pool pages. */

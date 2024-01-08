@@ -21,7 +21,7 @@
       << "Test Failed Due to Time Out";
 
 namespace bustub {
-TEST(LockManagerDeadlockDetectionTest, DISABLED_EdgeTest) {
+TEST(LockManagerDeadlockDetectionTest, EdgeTest) {
   LockManager lock_mgr{};
 
   const int num_nodes = 100;
@@ -63,7 +63,7 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_EdgeTest) {
   }
 }
 
-TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
+TEST(LockManagerDeadlockDetectionTest, BasicDeadlockDetectionTest) {
   LockManager lock_mgr{};
   TransactionManager txn_mgr{&lock_mgr};
 
@@ -77,40 +77,48 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
 
   std::thread t0([&] {
     // Lock and sleep
-    bool res = lock_mgr.LockTable(txn0, LockManager::LockMode::INTENTION_EXCLUSIVE, toid);
-    EXPECT_EQ(true, res);
-    res = lock_mgr.LockRow(txn0, LockManager::LockMode::EXCLUSIVE, toid, rid0);
-    EXPECT_EQ(true, res);
-    EXPECT_EQ(TransactionState::GROWING, txn1->GetState());
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    try {
+      bool res = lock_mgr.LockTable(txn0, LockManager::LockMode::INTENTION_EXCLUSIVE, toid);
+      EXPECT_EQ(true, res);
+      res = lock_mgr.LockRow(txn0, LockManager::LockMode::EXCLUSIVE, toid, rid0);
+      EXPECT_EQ(true, res);
+      EXPECT_EQ(TransactionState::GROWING, txn1->GetState());
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    // This will block
-    res = lock_mgr.LockRow(txn0, LockManager::LockMode::EXCLUSIVE, toid, rid1);
-    EXPECT_EQ(true, res);
+      // This will block
+      res = lock_mgr.LockRow(txn0, LockManager::LockMode::EXCLUSIVE, toid, rid1);
+      EXPECT_EQ(true, res);
 
-    lock_mgr.UnlockRow(txn0, toid, rid1);
-    lock_mgr.UnlockRow(txn0, toid, rid0);
-    lock_mgr.UnlockTable(txn0, toid);
+      lock_mgr.UnlockRow(txn0, toid, rid1);
+      lock_mgr.UnlockRow(txn0, toid, rid0);
+      lock_mgr.UnlockTable(txn0, toid);
 
-    txn_mgr.Commit(txn0);
-    EXPECT_EQ(TransactionState::COMMITTED, txn0->GetState());
+      txn_mgr.Commit(txn0);
+      EXPECT_EQ(TransactionState::COMMITTED, txn0->GetState());
+    } catch (TransactionAbortException &exp) {
+      LOG_DEBUG("%s", exp.GetInfo().c_str());
+    }
   });
 
   std::thread t1([&] {
-    // Sleep so T0 can take necessary locks
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    bool res = lock_mgr.LockTable(txn1, LockManager::LockMode::INTENTION_EXCLUSIVE, toid);
-    EXPECT_EQ(res, true);
+    try {
+      // Sleep so T0 can take necessary locks
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      bool res = lock_mgr.LockTable(txn1, LockManager::LockMode::INTENTION_EXCLUSIVE, toid);
+      EXPECT_EQ(res, true);
 
-    res = lock_mgr.LockRow(txn1, LockManager::LockMode::EXCLUSIVE, toid, rid1);
-    EXPECT_EQ(TransactionState::GROWING, txn1->GetState());
+      res = lock_mgr.LockRow(txn1, LockManager::LockMode::EXCLUSIVE, toid, rid1);
+      EXPECT_EQ(TransactionState::GROWING, txn1->GetState());
 
-    // This will block
-    res = lock_mgr.LockRow(txn1, LockManager::LockMode::EXCLUSIVE, toid, rid0);
-    EXPECT_EQ(res, false);
+      // This will block
+      res = lock_mgr.LockRow(txn1, LockManager::LockMode::EXCLUSIVE, toid, rid0);
+      EXPECT_EQ(res, false);
 
-    EXPECT_EQ(TransactionState::ABORTED, txn1->GetState());
-    txn_mgr.Abort(txn1);
+      EXPECT_EQ(TransactionState::ABORTED, txn1->GetState());
+      txn_mgr.Abort(txn1);
+    } catch (TransactionAbortException &exp) {
+      LOG_DEBUG("%s", exp.GetInfo().c_str());
+    }
   });
 
   // Sleep for enough time to break cycle

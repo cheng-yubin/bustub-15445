@@ -12,12 +12,15 @@
 
 #pragma once
 
+#include <algorithm>
+#include <ctime>
 #include <limits>
 #include <list>
+#include <memory>
 #include <mutex>  // NOLINT
 #include <unordered_map>
+#include <utility>
 #include <vector>
-
 #include "common/config.h"
 #include "common/macros.h"
 
@@ -132,14 +135,53 @@ class LRUKReplacer {
    */
   auto Size() -> size_t;
 
+  /**
+   * @brief Add the frame to EvictList according to its access history when the
+   * frame is set to evictable.
+   */
+  void AddToEvictList(frame_id_t frame_id);
+
+  /**
+   * @brief Remove the frame from EvictList when it is set to unevictable.
+   */
+  void RemoveFromEvictList(frame_id_t frame_id);
+
+  /**
+   * @brief Return whether frame1 should be evicted earlier than frame2.
+   *
+   */
+  auto EvictFirst(frame_id_t frame_id1, frame_id_t frame_id2) -> bool;
+  /**
+   *
+   */
+
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
-  // Remove maybe_unused if you start using them.
-  [[maybe_unused]] size_t current_timestamp_{0};
-  [[maybe_unused]] size_t curr_size_{0};
-  [[maybe_unused]] size_t replacer_size_;
-  [[maybe_unused]] size_t k_;
+
+  std::unordered_map<frame_id_t, size_t> access_cnt_;
+  std::unordered_map<frame_id_t, std::list<size_t>> access_hist_;
+  std::unordered_map<frame_id_t, bool> evictable_;
+
+  using k_time = std::pair<frame_id_t, size_t>;
+  std::list<frame_id_t> frames_new_;
+  std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> locale_new_;
+
+  std::list<k_time> frames_k_;
+  std::unordered_map<frame_id_t, std::list<k_time>::iterator> locale_k_;
+
+  // std::list<k_time>
+  // std::unordered_map<frame_id_t, std::shared_ptr<LRUKNode>> node_store_;
+  // std::list<frame_id_t> evict_list_;
+  // std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> evict_map_;
+
+  size_t curr_size_{0};   // the number of evictable frames.
+  size_t replacer_size_;  // the maximum number of the frames allowed.
+  size_t k_;
   std::mutex latch_;
+
+  size_t curr_timestamp_{0};
+
+  static auto CmpTimeStamp(const k_time &t1, const k_time &t2) -> bool;
 };
 
 }  // namespace bustub

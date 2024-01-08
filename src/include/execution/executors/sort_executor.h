@@ -13,6 +13,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "execution/executor_context.h"
@@ -22,7 +23,7 @@
 #include "storage/table/tuple.h"
 
 namespace bustub {
-
+class SortExecutorComparator;
 /**
  * The SortExecutor executor executes a sort.
  */
@@ -39,10 +40,10 @@ class SortExecutor : public AbstractExecutor {
   void Init() override;
 
   /**
-   * Yield the next tuple from the sort.
+   * Yield the next tupplle from the sort.
    * @param[out] tuple The next tuple produced by the sort
    * @param[out] rid The next tuple RID produced by the sort
-   * @return `true` if a tuple was produced, `false` if there are no more tuples
+   * @return `true` if a tue was produced, `false` if there are no more tuples
    */
   auto Next(Tuple *tuple, RID *rid) -> bool override;
 
@@ -52,5 +53,28 @@ class SortExecutor : public AbstractExecutor {
  private:
   /** The sort plan node to be executed */
   const SortPlanNode *plan_;
+
+  std::unique_ptr<AbstractExecutor> child_executor_;
+
+  std::vector<std::pair<RID, Tuple>> sort_table_;
+
+  uint32_t output_count_{0};
+
+  static SortExecutorComparator cmp;
 };
+
+class SortExecutorComparator {
+ public:
+  void Set(const SortPlanNode *plan, const Schema *scheme) {
+    plan_ = plan;
+    scheme_ = scheme;
+  }
+
+  auto operator()(const std::pair<RID, Tuple> &entity1, const std::pair<RID, Tuple> &entity2) -> bool;
+
+ private:
+  const SortPlanNode *plan_;
+  const Schema *scheme_;
+};
+
 }  // namespace bustub

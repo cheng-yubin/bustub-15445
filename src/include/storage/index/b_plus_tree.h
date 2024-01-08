@@ -10,8 +10,11 @@
 //===----------------------------------------------------------------------===//
 #pragma once
 
+#include <mutex>  // NOLINT
 #include <queue>
 #include <string>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "concurrency/transaction.h"
@@ -37,13 +40,20 @@ INDEX_TEMPLATE_ARGUMENTS
 class BPlusTree {
   using InternalPage = BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>;
   using LeafPage = BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>;
+  using WlatchVector = std::vector<std::pair<Page *, BPlusTreePage *>>;
 
  public:
   explicit BPlusTree(std::string name, BufferPoolManager *buffer_pool_manager, const KeyComparator &comparator,
                      int leaf_max_size = LEAF_PAGE_SIZE, int internal_max_size = INTERNAL_PAGE_SIZE);
 
+  ~BPlusTree();
+
+  enum Operat { INSERT, REMOVE };
+
   // Returns true if this B+ tree has no keys and values.
   auto IsEmpty() const -> bool;
+
+  void CreateTree();
 
   // Insert a key-value pair into this B+ tree.
   auto Insert(const KeyType &key, const ValueType &value, Transaction *transaction = nullptr) -> bool;
@@ -53,6 +63,30 @@ class BPlusTree {
 
   // return the value associated with a given key
   auto GetValue(const KeyType &key, std::vector<ValueType> *result, Transaction *transaction = nullptr) -> bool;
+
+  // 对于给定key，查找对应的leaf节点
+  // auto GetLeafPage(const KeyType &key, page_id_t &page_id, LeafPage **page_pptr) -> bool;
+  auto GetLeafPageOptimistic(const KeyType &key, Page **raw_page_pptr, LeafPage **leaf_page_pptr,
+                             Transaction *transaction, bool rw_option = false) -> bool;
+
+  auto GetLeafPagePessimistic(const KeyType &key, Page **raw_page_pptr, LeafPage **leaf_page_pptr,
+                              Transaction *transaction, Operat op, WlatchVector &pages_wlatch) -> bool;
+
+  auto CheckSafe(BPlusTreePage *page_ptr, Operat op) -> bool;
+
+  // 分裂节点
+  void SplitPage(page_id_t page_id);
+
+  // 节点重分布
+  void RedistributePage(page_id_t page_id, WlatchVector &pages_wlatch);
+
+  // 从兄弟节点借KV
+  auto BorrowFromSibling(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr, WlatchVector &pages_wlatch) -> bool;
+
+  // 合并节点
+  void Merge(BPlusTreePage *page_ptr, InternalPage *parent_page_ptr, WlatchVector &pages_wlatch);
+  void MergePage(BPlusTreePage *left_page_ptr, BPlusTreePage *right_page_ptr, InternalPage *parent_page_ptr,
+                 WlatchVector &pages_wlatch);
 
   // return the page id of the root node
   auto GetRootPageId() -> page_id_t;
@@ -89,6 +123,8 @@ class BPlusTree {
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
+
+  std::mutex root_mutex_;
 };
 
 }  // namespace bustub

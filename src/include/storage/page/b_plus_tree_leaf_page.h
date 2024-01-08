@@ -48,11 +48,27 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   // helper methods
   auto GetNextPageId() const -> page_id_t;
   void SetNextPageId(page_id_t next_page_id);
+
   auto KeyAt(int index) const -> KeyType;
+  auto ValueAt(int index) const -> ValueType;
+
+  auto ItemAt(int index) -> MappingType &;
+
+  // 已知key,查找value
+  auto GetValue(const KeyType &key, std::vector<ValueType> *result, const KeyComparator &comparator) const -> bool;
+
+  // 插入KV
+  auto InsertKV(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool;
+
+  // 删除key
+  auto RemoveKey(const KeyType &key, const KeyComparator &comparator) -> bool;
+
+  // 查找key
+  auto FindKey(const KeyType &key, const KeyComparator &comparator) -> int;
 
  private:
   page_id_t next_page_id_;
   // Flexible array member for page data.
-  MappingType array_[1];
+  MappingType array_[LEAF_PAGE_SIZE];
 };
 }  // namespace bustub

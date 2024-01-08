@@ -14,6 +14,7 @@
 
 #include <vector>
 
+#include "concurrency/transaction_manager.h"
 #include "execution/executor_context.h"
 #include "execution/executors/abstract_executor.h"
 #include "execution/plans/seq_scan_plan.h"
@@ -47,8 +48,15 @@ class SeqScanExecutor : public AbstractExecutor {
   /** @return The output schema for the sequential scan */
   auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); }
 
+  void TryLock(LockManager::ResourceType type, LockManager::LockMode lock_mode, RID *rid = nullptr);
+
+  void TryUnlock(LockManager::ResourceType type, RID *rid = nullptr);
+
  private:
   /** The sequential scan plan node to be executed */
   const SeqScanPlanNode *plan_;
+
+  bustub::TableIterator iter_;
+  bustub::TableIterator end_;
 };
 }  // namespace bustub

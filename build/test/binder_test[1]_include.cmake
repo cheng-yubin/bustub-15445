@@ -1,0 +1,5 @@
+if(EXISTS "/home/cyb/cmu15445/bustub-15445/build/test/binder_test[1]_tests.cmake")
+  include("/home/cyb/cmu15445/bustub-15445/build/test/binder_test[1]_tests.cmake")
+else()
+  add_test(binder_test_NOT_BUILT binder_test_NOT_BUILT)
+endif()

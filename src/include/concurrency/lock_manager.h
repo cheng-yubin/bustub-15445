@@ -17,6 +17,9 @@
 #include <list>
 #include <memory>
 #include <mutex>  // NOLINT
+#include <queue>
+#include <set>
+#include <sstream>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -36,7 +39,7 @@ class TransactionManager;
 class LockManager {
  public:
   enum class LockMode { SHARED, EXCLUSIVE, INTENTION_SHARED, INTENTION_EXCLUSIVE, SHARED_INTENTION_EXCLUSIVE };
-
+  enum class ResourceType { TBALE, ROW };
   /**
    * Structure to hold a lock request.
    * This could be a lock request on a table OR a row.
@@ -64,13 +67,23 @@ class LockManager {
   class LockRequestQueue {
    public:
     /** List of lock requests for the same resource (table or row) */
-    std::list<LockRequest *> request_queue_;
+    // std::list<LockRequest *> request_queue_;
+    std::list<std::unique_ptr<LockRequest>> request_queue_;
     /** For notifying blocked transactions on this rid */
     std::condition_variable cv_;
     /** txn_id of an upgrading transaction (if any) */
     txn_id_t upgrading_ = INVALID_TXN_ID;
     /** coordination */
     std::mutex latch_;
+
+    void PrintQueue() {
+      std::stringstream buf;
+      buf << "Queue: \n";
+      for (auto &p : request_queue_) {
+        buf << "txn: " << p->txn_id_ << " granted: " << p->granted_ << " lock mode: " << int(p->lock_mode_) << "\n";
+      }
+      LOG_DEBUG("%s", buf.str().c_str());
+    }
   };
 
   /**
@@ -79,6 +92,17 @@ class LockManager {
   LockManager() {
     enable_cycle_detection_ = true;
     cycle_detection_thread_ = new std::thread(&LockManager::RunCycleDetection, this);
+
+    incompatible_mode_[LockMode::INTENTION_SHARED] = {LockMode::EXCLUSIVE};
+    incompatible_mode_[LockMode::SHARED] = {LockMode::INTENTION_EXCLUSIVE, LockMode::SHARED_INTENTION_EXCLUSIVE,
+                                            LockMode::EXCLUSIVE};
+    incompatible_mode_[LockMode::INTENTION_EXCLUSIVE] = {LockMode::SHARED, LockMode::SHARED_INTENTION_EXCLUSIVE,
+                                                         LockMode::EXCLUSIVE};
+    incompatible_mode_[LockMode::SHARED_INTENTION_EXCLUSIVE] = {
+        LockMode::SHARED, LockMode::INTENTION_EXCLUSIVE, LockMode::SHARED_INTENTION_EXCLUSIVE, LockMode::EXCLUSIVE};
+    incompatible_mode_[LockMode::EXCLUSIVE] = {LockMode::INTENTION_SHARED, LockMode::SHARED,
+                                               LockMode::INTENTION_EXCLUSIVE, LockMode::SHARED_INTENTION_EXCLUSIVE,
+                                               LockMode::EXCLUSIVE};
   }
 
   ~LockManager() {
@@ -203,6 +227,21 @@ class LockManager {
    *    appropriately (check transaction.h)
    */
 
+  void CheckLockModeLegal(Transaction *txn, LockMode lock_mode, ResourceType type, const table_oid_t &oid);
+  // auto CheckTableLockUpgradeLegal(Transaction *txn, LockMode lock_mode, const table_oid_t &oid) -> int;
+  // auto CheckRowLockUpgradeLegal(Transaction *txn, LockMode lock_mode, const table_oid_t &oid, const RID &rid) -> int;
+  auto CheckLockUpgradeLegal(Transaction *txn, ResourceType type, LockMode lock_mode, const table_oid_t &oid,
+                             const RID &rid, std::optional<LockMode> &old_lock_mode) -> int;
+
+  auto AssignLock(Transaction *txn, LockMode lock_mode, const std::shared_ptr<LockRequestQueue> &lock_queue,
+                  ResourceType type) -> bool;
+
+  auto GetUnlockMode(Transaction *txn, ResourceType type, const table_oid_t &oid, const RID &rid) -> LockMode;
+
+  void InsertLockSet(Transaction *txn, ResourceType type, LockMode lock_mode, const table_oid_t &oid, const RID &rid);
+  void EraseLockSet(Transaction *txn, ResourceType type, LockMode lock_mode, const table_oid_t &oid, const RID &rid);
+
+  void TxnStates2Shrinking(Transaction *txn, LockMode lock_mode);
   /**
    * Acquire a lock on table_oid_t in the given lock_mode.
    * If the transaction already holds a lock on the table, upgrade the lock
@@ -297,6 +336,13 @@ class LockManager {
    */
   auto RunCycleDetection() -> void;
 
+  void BuildWaitsForMap();
+
+  void AbortTxnForCycle(txn_id_t txn_id);
+
+  auto DFS(txn_id_t curr, std::set<txn_id_t> &not_visited, std::unordered_map<txn_id_t, txn_id_t> &path,
+           txn_id_t *txn_id) -> bool;
+
  private:
   /** Fall 2022 */
   /** Structure that holds lock requests for a given table oid */
@@ -308,6 +354,8 @@ class LockManager {
   std::unordered_map<RID, std::shared_ptr<LockRequestQueue>> row_lock_map_;
   /** Coordination */
   std::mutex row_lock_map_latch_;
+
+  std::unordered_map<LockMode, std::vector<LockMode>> incompatible_mode_;
 
   std::atomic<bool> enable_cycle_detection_;
   std::thread *cycle_detection_thread_;

@@ -180,7 +180,7 @@ class ExtendibleHashTable : public HashTable<K, V> {
    * @brief Redistribute the kv pairs in a full bucket.
    * @param bucket The bucket to be redistributed.
    */
-  auto RedistributeBucket(std::shared_ptr<Bucket> bucket) -> void;
+  auto RedistributeBucket(const K &key) -> void;
 
   /*****************************************************************
    * Must acquire latch_ first before calling the below functions. *
@@ -196,6 +196,9 @@ class ExtendibleHashTable : public HashTable<K, V> {
   auto GetGlobalDepthInternal() const -> int;
   auto GetLocalDepthInternal(int dir_index) const -> int;
   auto GetNumBucketsInternal() const -> int;
+  auto FindInternal(const K &key, V &value) -> bool;
+  auto RemoveInternal(const K &key) -> bool;
+  void InsertInternal(const K &key, const V &value);
 };
 
 }  // namespace bustub

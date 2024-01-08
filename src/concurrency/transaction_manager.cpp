@@ -44,6 +44,7 @@ auto TransactionManager::Begin(Transaction *txn, IsolationLevel isolation_level)
 }
 
 void TransactionManager::Commit(Transaction *txn) {
+  LOG_DEBUG("submit called. txn = %d", txn->GetTransactionId());
   txn->SetState(TransactionState::COMMITTED);
 
   // Perform all deletes before we commit.
@@ -66,6 +67,8 @@ void TransactionManager::Commit(Transaction *txn) {
 }
 
 void TransactionManager::Abort(Transaction *txn) {
+  LOG_DEBUG("abort called: txn = %d", txn->GetTransactionId());
+
   txn->SetState(TransactionState::ABORTED);
   // Rollback before releasing the lock.
   auto table_write_set = txn->GetWriteSet();
